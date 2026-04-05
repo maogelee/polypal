@@ -1,0 +1,3285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Polypal"/>
+<meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)"/>
+<meta name="theme-color" content="#f5f4f0" media="(prefers-color-scheme: light)"/>
+<title>Polypal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #f5f4f0;
+  --bg2: #eceae4;
+  --bg3: #e2e0d8;
+  --surface: #ffffff;
+  --surface2: #f0ede6;
+  --text: #1a1916;
+  --text2: #6b6860;
+  --text3: #a8a5a0;
+  --accent: #2d5be3;
+  --accent-bg: #e8edfb;
+  --accent-text: #1a3db0;
+  --success: #1a7a4a;
+  --success-bg: #e6f4ed;
+  --warn: #b85c00;
+  --warn-bg: #fef0e0;
+  --danger: #c0392b;
+  --danger-bg: #fdecea;
+  --border: rgba(0,0,0,0.08);
+  --border2: rgba(0,0,0,0.14);
+  --tab-h: 72px;
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-t: env(safe-area-inset-top, 0px);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f0f0d;
+    --bg2: #171714;
+    --bg3: #1e1e1a;
+    --surface: #1c1c19;
+    --surface2: #232320;
+    --text: #f0ede6;
+    --text2: #9e9b94;
+    --text3: #5a5850;
+    --accent: #5b82f0;
+    --accent-bg: #1a2340;
+    --accent-text: #8aaaf5;
+    --success: #3db870;
+    --success-bg: #0f2a1c;
+    --warn: #f0922b;
+    --warn-bg: #2a1a08;
+    --danger: #e55c4a;
+    --danger-bg: #2a0f0d;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --shadow: 0 2px 12px rgba(0,0,0,0.3);
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overflow: hidden; background: var(--bg); }
+body { font-family: 'Outfit', 'Noto Sans SC', sans-serif; color: var(--text); overscroll-behavior: none; }
+
+/* APP SHELL */
+#app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
+#header {
+  background: var(--bg);
+  padding: calc(var(--safe-t) + 14px) 20px 14px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.header-title { font-size: 20px; font-weight: 600; letter-spacing: -0.3px; color: var(--text); }
+.header-sub { font-size: 12px; color: var(--text3); margin-top: 1px; }
+.header-lang-pill {
+  background: var(--accent-bg); color: var(--accent-text);
+  font-size: 13px; font-weight: 500; padding: 6px 14px;
+  border-radius: 20px; cursor: pointer; border: none;
+  display: flex; align-items: center; gap: 6px;
+}
+#pages { flex: 1; overflow: hidden; position: relative; }
+.page { position: absolute; inset: 0; overflow-y: auto; display: none; padding: 16px 16px calc(var(--tab-h) + var(--safe-b) + 16px); }
+.page.active { display: block; }
+#tabbar {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: calc(var(--tab-h) + var(--safe-b));
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: flex-start; padding-top: 8px;
+  z-index: 100;
+}
+.tab-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  cursor: pointer; border: none; background: none; padding: 4px 0;
+  color: var(--text3); transition: color 0.18s;
+}
+.tab-item.active { color: var(--accent); }
+.tab-icon { font-size: 22px; line-height: 1; }
+.tab-label { font-size: 10px; font-weight: 500; letter-spacing: 0.2px; }
+
+/* CARDS */
+.card {
+  background: var(--surface); border-radius: var(--radius);
+  border: 1px solid var(--border); padding: 16px; margin-bottom: 12px;
+}
+.card-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 12px; letter-spacing: -0.2px; }
+.sec-label { font-size: 12px; color: var(--text3); margin-bottom: 8px; font-weight: 500; letter-spacing: 0.3px; text-transform: uppercase; }
+
+/* INPUTS */
+input[type=text], select, textarea {
+  width: 100%; background: var(--bg2); border: 1px solid var(--border2);
+  border-radius: var(--radius-sm); padding: 12px 14px; font-size: 15px;
+  color: var(--text); font-family: inherit; outline: none;
+  transition: border-color 0.15s;
+}
+input[type=text]:focus, select:focus { border-color: var(--accent); }
+select { appearance: none; -webkit-appearance: none; cursor: pointer; }
+
+/* BUTTONS */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 12px 20px; border-radius: var(--radius-sm); font-size: 14px;
+  font-weight: 500; font-family: inherit; cursor: pointer; border: none;
+  transition: opacity 0.15s, transform 0.1s; letter-spacing: -0.1px;
+}
+.btn:active { transform: scale(0.97); opacity: 0.85; }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-ghost { background: var(--bg2); color: var(--text); border: 1px solid var(--border2); }
+.btn-block { width: 100%; }
+.btn-sm { padding: 8px 14px; font-size: 13px; border-radius: 8px; }
+
+/* TAGS */
+.tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  padding: 7px 14px; border-radius: 20px; font-size: 13px; cursor: pointer;
+  background: var(--bg2); color: var(--text2); border: 1px solid var(--border);
+  font-family: inherit; transition: all 0.15s;
+}
+.chip:active { transform: scale(0.95); }
+.chip.sel { background: var(--accent-bg); color: var(--accent-text); border-color: var(--accent); }
+
+/* PHRASES */
+.phrase-row {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 0; border-bottom: 1px solid var(--border);
+}
+.phrase-row:last-child { border-bottom: none; padding-bottom: 0; }
+.phrase-body { flex: 1; }
+.phrase-en { font-size: 15px; font-weight: 500; color: var(--text); line-height: 1.4; }
+.phrase-cn { font-size: 13px; color: var(--text2); margin-top: 3px; }
+.phrase-note { font-size: 11px; color: var(--text3); margin-top: 3px; }
+.star-btn { font-size: 20px; color: var(--text3); cursor: pointer; padding: 2px; flex-shrink: 0; background: none; border: none; }
+.star-btn.on { color: #f0a020; }
+
+/* BUBBLES */
+.bubble-wrap { display: flex; flex-direction: column; margin-bottom: 10px; }
+.bubble-wrap.r { align-items: flex-end; }
+.blbl { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+.bubble {
+  max-width: 84%; padding: 10px 14px; border-radius: 16px;
+  font-size: 14px; line-height: 1.6;
+}
+.bubble.l { background: var(--surface2); border-bottom-left-radius: 4px; }
+.bubble.r2 { background: var(--accent-bg); color: var(--accent-text); border-bottom-right-radius: 4px; }
+.bubble-cn { font-size: 12px; opacity: 0.7; margin-top: 4px; }
+
+/* BADGES */
+.badge {
+  display: inline-flex; align-items: center; padding: 3px 10px;
+  border-radius: 20px; font-size: 12px; font-weight: 500;
+}
+.badge-blue { background: var(--accent-bg); color: var(--accent-text); }
+.badge-green { background: var(--success-bg); color: var(--success); }
+.badge-warn { background: var(--warn-bg); color: var(--warn); }
+
+/* LOADING */
+.loading { color: var(--text3); font-size: 14px; padding: 20px 0; text-align: center; }
+.dot { display: inline-block; animation: blink 1.2s infinite; }
+.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:0}40%{opacity:1}}
+
+/* TEST OPTIONS */
+.opt {
+  display: block; width: 100%; text-align: left; padding: 13px 16px;
+  margin-bottom: 8px; border-radius: var(--radius-sm); font-size: 14px;
+  border: 1px solid var(--border2); background: var(--surface2);
+  color: var(--text); cursor: pointer; font-family: inherit;
+  transition: all 0.15s;
+}
+.opt:active { transform: scale(0.98); }
+.opt.correct { border-color: var(--success); background: var(--success-bg); color: var(--success); }
+.opt.wrong { border-color: var(--danger); background: var(--danger-bg); color: var(--danger); }
+
+/* PLAN ROWS */
+.day-row {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 11px 0; border-bottom: 1px solid var(--border);
+}
+.day-row:last-child { border-bottom: none; }
+.check-circle {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 1.5px solid var(--border2); cursor: pointer;
+  flex-shrink: 0; margin-top: 1px; display: flex; align-items: center;
+  justify-content: center; font-size: 11px; background: none;
+  transition: all 0.15s;
+}
+.check-circle.done { background: var(--success); border-color: var(--success); color: #fff; }
+.day-num { font-size: 11px; color: var(--text3); font-weight: 600; min-width: 42px; padding-top: 2px; }
+.day-info { flex: 1; }
+.day-topic { font-size: 14px; color: var(--text); font-weight: 500; }
+.day-task { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.day-topic.done-text { text-decoration: line-through; color: var(--text3); }
+
+/* PROGRESS BAR */
+.prog-wrap { background: var(--bg3); border-radius: 4px; height: 6px; }
+.prog-fill { height: 6px; border-radius: 4px; background: var(--accent); transition: width 0.4s; }
+
+/* STATS ROW */
+.stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+.stat-card { background: var(--bg2); border-radius: var(--radius-sm); padding: 12px; text-align: center; }
+.stat-val { font-size: 22px; font-weight: 600; color: var(--text); }
+.stat-lbl { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+/* LEVEL PICKER */
+.level-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 14px; }
+.level-card {
+  border: 1.5px solid var(--border2); border-radius: var(--radius-sm);
+  padding: 12px 8px; text-align: center; cursor: pointer;
+  transition: all 0.15s; background: var(--surface2);
+}
+.level-card.sel { border-color: var(--accent); background: var(--accent-bg); }
+.level-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.level-desc { font-size: 11px; color: var(--text3); margin-top: 3px; }
+.level-card.sel .level-name { color: var(--accent-text); }
+
+/* TYPE GRID */
+.type-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 14px; }
+.type-card {
+  border: 1.5px solid var(--border2); border-radius: var(--radius-sm);
+  padding: 12px 8px; text-align: center; cursor: pointer;
+  background: var(--surface2); transition: all 0.15s;
+}
+.type-card.sel { border-color: var(--accent); background: var(--accent-bg); }
+.type-icon { font-size: 20px; margin-bottom: 6px; }
+.type-name { font-size: 12px; font-weight: 600; color: var(--text); }
+.type-card.sel .type-name { color: var(--accent-text); }
+
+/* DAILY */
+.st-hero {
+  background: var(--accent-bg); border-radius: var(--radius);
+  padding: 20px 16px; margin-bottom: 12px; text-align: center;
+}
+.st-topic { font-size: 20px; font-weight: 600; color: var(--accent-text); margin-bottom: 6px; }
+.st-scene { font-size: 13px; color: var(--accent); opacity: 0.8; }
+
+/* WEEK HEADER */
+.week-header {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+}
+
+/* SUBTABS */
+.subtabs { display: flex; gap: 8px; margin-bottom: 14px; }
+.stab {
+  padding: 7px 16px; border-radius: 20px; font-size: 13px; font-weight: 500;
+  cursor: pointer; border: 1px solid var(--border2); background: none;
+  color: var(--text2); font-family: inherit; transition: all 0.15s;
+}
+.stab.active { background: var(--accent-bg); color: var(--accent-text); border-color: var(--accent); }
+
+/* PAGE HEADER */
+.page-hd { margin-bottom: 16px; }
+.page-hd h2 { font-size: 22px; font-weight: 600; letter-spacing: -0.5px; color: var(--text); }
+.page-hd p { font-size: 13px; color: var(--text3); margin-top: 4px; }
+
+/* RESULT SCORE */
+.result-score {
+  text-align: center; padding: 30px 20px 24px;
+  background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+.score-big { font-size: 52px; font-weight: 600; color: var(--text); letter-spacing: -2px; }
+.score-denom { font-size: 22px; color: var(--text3); }
+
+/* SAVED EMPTY */
+.empty-state { text-align: center; padding: 60px 20px; color: var(--text3); }
+.empty-icon { font-size: 40px; margin-bottom: 12px; }
+.empty-text { font-size: 14px; }
+
+/* LANG SELECT MODAL */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  z-index: 200; display: flex; align-items: flex-end;
+  opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal-sheet {
+  width: 100%; background: var(--surface);
+  border-radius: 20px 20px 0 0;
+  padding: 20px 20px calc(var(--safe-b) + 20px);
+  max-height: 80vh; overflow-y: auto;
+  transform: translateY(100%); transition: transform 0.25s cubic-bezier(0.32,0.72,0,1);
+}
+.modal-overlay.open .modal-sheet { transform: translateY(0); }
+.modal-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; text-align: center; }
+.lang-option {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 0; border-bottom: 1px solid var(--border); cursor: pointer;
+}
+.lang-option:last-child { border-bottom: none; }
+.lang-option-name { font-size: 15px; font-weight: 500; color: var(--text); }
+.lang-option-flag { font-size: 20px; }
+.lang-option.sel .lang-option-name { color: var(--accent); }
+
+/* TIPS */
+.tip-row { display: flex; gap: 10px; margin-bottom: 10px; }
+.tip-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 6px; }
+.tip-text { font-size: 14px; color: var(--text); line-height: 1.5; }
+
+/* SECTION DIVIDER */
+.divider { height: 1px; background: var(--border); margin: 14px 0; }
+
+/* MINI PROGRESS */
+.mini-prog { margin-top: 6px; }
+
+/* PLAN PRACTICE BTN */
+.prac-btn {
+  font-size: 12px; padding: 6px 12px; border-radius: 8px;
+  background: var(--accent-bg); color: var(--accent-text);
+  border: none; cursor: pointer; font-family: inherit; font-weight: 500;
+  flex-shrink: 0; margin-top: 1px;
+}
+/* MODEL SWITCHER */
+.model-bar {
+  display: flex; gap: 6px; background: var(--bg2);
+  border-radius: 10px; padding: 4px; margin-bottom: 0;
+}
+.model-btn {
+  flex: 1; padding: 7px 10px; border-radius: 7px; border: none;
+  font-size: 12px; font-weight: 600; font-family: inherit;
+  cursor: pointer; transition: all 0.15s; color: var(--text3);
+  background: none; display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+.model-btn.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+/* SETTINGS */
+.setting-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 0; border-bottom: 1px solid var(--border);
+}
+.setting-row:last-child { border-bottom: none; }
+.setting-label { font-size: 15px; color: var(--text); font-weight: 500; }
+.setting-desc { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.key-input-wrap { position: relative; margin-top: 8px; }
+.key-input-wrap input { padding-right: 70px; font-family: monospace; font-size: 13px; }
+.key-toggle { position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  font-size: 12px; color: var(--accent); cursor: pointer; background: none; border: none; font-family: inherit; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.status-dot.ok { background: var(--success); }
+.status-dot.no { background: var(--text3); }
+.info-box {
+  background: var(--accent-bg); border-radius: var(--radius-sm);
+  padding: 12px 14px; font-size: 13px; color: var(--accent-text); line-height: 1.6;
+  margin-bottom: 12px;
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="header">
+    <div>
+      <div class="header-title">Polypal</div>
+      <div class="header-sub" id="header-sub">语言学习助手</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button class="header-lang-pill" onclick="openLangModal()">
+        <span id="header-lang-flag">🇬🇧</span>
+        <span id="header-lang-name">英语</span>
+      </button>
+      <button onclick="goPage('settings',3)" style="width:34px;height:34px;border-radius:50%;
+        border:1px solid var(--border2);background:var(--bg2);cursor:pointer;
+        display:flex;align-items:center;justify-content:center;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div id="pages">
+    <!-- 主页 -->
+    <div class="page active" id="page-learn">
+      <div id="home-profile-out"></div>
+      <div style="height:1px;background:var(--border);margin:4px 0 16px;"></div>
+      <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:12px;">常用语</div>
+      <div class="card">
+        <div class="sec-label">话题</div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <input type="text" id="learn-input" placeholder="例如：在餐厅点餐、看医生…"/>
+          <button class="btn btn-primary" onclick="doLearn()" style="flex-shrink:0;padding:12px 16px;">生成</button>
+        </div>
+        <div class="tags" id="learn-tags"></div>
+      </div>
+      <div id="learn-out" style="display:none;">
+        <div class="subtabs">
+          <button class="stab active" onclick="switchSub('phrases',this)">常用语</button>
+          <button class="stab" onclick="switchSub('dialogue',this)">模拟对话</button>
+        </div>
+        <div id="sub-phrases"></div>
+        <div id="sub-dialogue" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- 计划 + 测试 (merged) -->
+    <div class="page" id="page-plan">
+      <!-- Plan subtabs -->
+      <div class="subtabs" style="margin-bottom:16px;">
+        <button class="stab active" id="ptab-plan" onclick="switchPlanTab('plan',this)">学习计划</button>
+        <button class="stab" id="ptab-test" onclick="switchPlanTab('test',this)">语言测试</button>
+      </div>
+
+      <!-- Plan sub-page -->
+      <div id="plan-subpage">
+        <div id="plan-setup-view">
+          <div id="plan-test-banner"></div>
+          <div class="card">
+            <div class="sec-label" style="margin-bottom:10px;">当前水平</div>
+            <div class="level-grid" id="level-grid"></div>
+            <div class="sec-label" style="margin-bottom:6px;">你的目标</div>
+            <input type="text" id="plan-goal" placeholder="例如：雅思6.5 / 能流利日常对话 / 工作面试没问题" style="margin-bottom:14px;"/>
+            <div class="sec-label" style="margin-bottom:10px;">每天时间</div>
+            <select id="plan-time" style="margin-bottom:4px;">
+              <option value="10">10分钟（轻松模式）</option>
+              <option value="20" selected>20分钟（推荐）</option>
+              <option value="30">30分钟（强化模式）</option>
+            </select>
+          </div>
+          <button class="btn btn-primary btn-block" onclick="genPlan()" style="margin-top:4px;">生成我的计划</button>
+        </div>
+        <div id="plan-result-view" style="display:none;"></div>
+      </div>
+
+      <!-- Test sub-page -->
+      <div id="test-subpage" style="display:none;">
+        <div id="test-home-view">
+          <div id="test-level-banner" style="display:none;"></div>
+          <div class="card" style="text-align:center;padding:24px 20px;">
+            <div style="font-size:40px;margin-bottom:12px;">✏️</div>
+            <div style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:6px;">综合能力测试</div>
+            <div style="font-size:13px;color:var(--text3);margin-bottom:20px;">15道题，涵盖词汇、情景对话、听力理解<br>约5-8分钟完成</div>
+            <button class="btn btn-primary" style="padding:13px 40px;font-size:15px;" onclick="startTest()">开始测试</button>
+          </div>
+          <div id="test-history-preview"></div>
+        </div>
+        <div id="test-q-view" style="display:none;"></div>
+        <div id="test-res-view" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- 每日练习 -->
+    <div class="page" id="page-daily">
+      <div class="page-hd"><h2>每日练习</h2><p>今日打卡 + Small Talk 练习</p></div>
+      <div id="daily-out"></div>
+    </div>
+
+    <!-- 学习档案 -->
+    <div class="page" id="page-saved">
+      <div class="page-hd"><h2>学习档案</h2><p>你的进步一目了然</p></div>
+      <div id="saved-out"></div>
+    </div>
+
+    <!-- 设置 -->
+    <div class="page" id="page-settings">
+      <div class="page-hd"><h2>设置</h2><p>API Key 和偏好配置</p></div>
+
+      <div class="info-box">
+        API Key 只存在你手机本地（localStorage），不会上传到任何服务器。两个 Key 填哪个用哪个，也可以都填。
+      </div>
+
+      <!-- Claude -->
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <span style="font-size:20px;">🤖</span>
+          <div>
+            <div style="font-size:15px;font-weight:600;color:var(--text);">Claude API Key</div>
+            <div style="font-size:12px;color:var(--text3);">Anthropic · claude-sonnet-4-20250514</div>
+          </div>
+          <div class="status-dot" id="dot-claude" style="margin-left:auto;"></div>
+        </div>
+        <div class="key-input-wrap">
+          <input type="password" id="key-claude" placeholder="sk-ant-api…" oninput="saveKey('claude')"/>
+          <button class="key-toggle" onclick="toggleVis('key-claude',this)">显示</button>
+        </div>
+        <div style="margin-top:10px;display:flex;gap:8px;">
+          <button class="btn btn-ghost btn-sm" onclick="testKey('claude')">验证 Key</button>
+          <a href="https://console.anthropic.com/settings/keys" target="_blank" class="btn btn-ghost btn-sm" style="text-decoration:none;">获取 Key ↗</a>
+        </div>
+      </div>
+
+      <!-- GPT -->
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <span style="font-size:20px;">✨</span>
+          <div>
+            <div style="font-size:15px;font-weight:600;color:var(--text);">OpenAI API Key</div>
+            <div style="font-size:12px;color:var(--text3);">OpenAI · gpt-4o-mini</div>
+          </div>
+          <div class="status-dot" id="dot-gpt" style="margin-left:auto;"></div>
+        </div>
+        <div class="key-input-wrap">
+          <input type="password" id="key-gpt" placeholder="sk-…" oninput="saveKey('gpt')"/>
+          <button class="key-toggle" onclick="toggleVis('key-gpt',this)">显示</button>
+        </div>
+        <div style="margin-top:10px;display:flex;gap:8px;">
+          <button class="btn btn-ghost btn-sm" onclick="testKey('gpt')">验证 Key</button>
+          <a href="https://platform.openai.com/api-keys" target="_blank" class="btn btn-ghost btn-sm" style="text-decoration:none;">获取 Key ↗</a>
+        </div>
+      </div>
+
+      <!-- 当前使用 -->
+      <div class="card">
+        <div class="sec-label" style="margin-bottom:10px;">当前使用模型</div>
+        <div class="model-bar" style="max-width:280px;">
+          <button class="model-btn" id="sbtn-claude" onclick="switchModel('claude')">🤖 Claude</button>
+          <button class="model-btn" id="sbtn-gpt" onclick="switchModel('gpt')">✨ GPT-4o</button>
+        </div>
+        <div style="font-size:12px;color:var(--text3);margin-top:10px;" id="model-status-text"></div>
+      </div>
+
+      <!-- 清除数据 -->
+      <div class="card">
+        <div class="card-title">数据管理</div>
+        <div class="setting-row">
+          <div><div class="setting-label">清除错误记忆</div><div class="setting-desc">重置薄弱点分析数据</div></div>
+          <button class="btn btn-ghost btn-sm" onclick="if(confirm('确认清除？')){state.errorMemory=[];localStorage.removeItem(lk('errors'));alert('已清除');}">清除</button>
+        </div>
+        <div class="setting-row">
+          <div><div class="setting-label">清除测试历史</div><div class="setting-desc">删除所有成绩记录</div></div>
+          <button class="btn btn-ghost btn-sm" onclick="if(confirm('确认清除？')){state.testHistory=[];localStorage.removeItem(lk('history'));alert('已清除');}">清除</button>
+        </div>
+        <div class="setting-row">
+          <div><div class="setting-label">清除学习计划</div><div class="setting-desc">重置30天进度</div></div>
+          <button class="btn btn-ghost btn-sm" onclick="if(confirm('确认清除？'))resetPlan()">清除</button>
+        </div>
+        <div class="setting-row">
+          <div><div class="setting-label">清除收藏句子</div><div class="setting-desc">删除所有收藏</div></div>
+          <button class="btn btn-ghost btn-sm" onclick="if(confirm('确认清除？')){state.saved=[];localStorage.removeItem(lk('saved'));renderSaved();alert('已清除');}">清除</button>
+        </div>
+      </div>
+
+      <div style="text-align:center;padding:16px 0 8px;font-size:12px;color:var(--text3);">
+        LangBuddy · 仅供个人使用
+      </div>
+    </div>
+  </div>
+
+  <div id="tabbar">
+    <button class="tab-item active" onclick="goPage('learn',0)" data-i="0">
+      <div class="tab-icon">🏠</div><div class="tab-label">主页</div>
+    </button>
+    <button class="tab-item" onclick="goPage('plan',1)" data-i="1">
+      <div class="tab-icon">📅</div><div class="tab-label">计划</div>
+    </button>
+    <button class="tab-item" onclick="goPage('daily',2)" data-i="2">
+      <div class="tab-icon">💬</div><div class="tab-label">每日</div>
+    </button>
+    <button class="tab-item" onclick="goPage('saved',3)" data-i="3">
+      <div class="tab-icon">📊</div><div class="tab-label">档案</div>
+    </button>
+  </div>
+</div>
+
+<!-- 语言选择弹窗 -->
+<div class="modal-overlay" id="lang-modal" onclick="closeLangModal(event)">
+  <div class="modal-sheet">
+    <div style="width:40px;height:4px;border-radius:2px;background:var(--border2);margin:0 auto 16px;"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div class="modal-title" style="margin:0;">选择学习语言</div>
+      <button onclick="document.getElementById('lang-modal').classList.remove('open')" style="background:none;border:none;font-size:18px;color:var(--text3);cursor:pointer;padding:4px;">✕</button>
+    </div>
+    <div id="lang-options"></div>
+  </div>
+</div>
+
+<script>
+const LANGS = [
+  {val:'English',   name:'英语',   flag:'🇬🇧', region:'英语'},
+  {val:'French',    name:'法语',   flag:'🇫🇷', region:'法语'},
+  {val:'Spanish',   name:'西班牙语', flag:'🇪🇸', region:'西班牙语'},
+  {val:'Japanese',  name:'日语',   flag:'🇯🇵', region:'日语'},
+  {val:'Korean',    name:'韩语',   flag:'🇰🇷', region:'韩语'},
+  {val:'German',    name:'德语',   flag:'🇩🇪', region:'德语'},
+  {val:'Italian',   name:'意大利语', flag:'🇮🇹', region:'意大利语'},
+  {val:'Portuguese',name:'葡萄牙语', flag:'🇧🇷', region:'葡萄牙语'},
+  {val:'Russian',   name:'俄语',   flag:'🇷🇺', region:'俄语'},
+  {val:'Arabic',    name:'阿拉伯语', flag:'🇸🇦', region:'阿拉伯语'},
+  {val:'Dutch',     name:'荷兰语', flag:'🇳🇱', region:'荷兰语'},
+  {val:'Cantonese', name:'粤语',   flag:'🇭🇰', region:'粤语'},
+];
+const TOPICS = ['餐厅点餐','超市购物','看医生','问路','租房','银行业务','学校沟通','停车缴费','咖啡店','邮局寄件'];
+const TEST_TYPES = [{val:'vocab',icon:'📝',name:'词汇理解'},{val:'scene',icon:'🎭',name:'情景填空'},{val:'listen',icon:'🔊',name:'听力理解'}];
+const LEVELS = [{val:'初级',name:'初级',desc:'刚开始学'},{val:'中级',name:'中级',desc:'日常能沟通'},{val:'高级',name:'高级',desc:'想精进表达'}];
+const DAILY_TOPICS = ['谈论天气','自我介绍','聊周末计划','咖啡店闲聊','讨论电影','邻居闲聊','同事午餐','谈加拿大生活'];
+
+let state = {
+  lang: 'English', langName: '英语', langFlag: '🇬🇧',
+  testType: 'vocab', testDiff: '中级', planLevel: '初级',
+  curTopic: '', learnSubTab: 'phrases',
+  testQ: [], testIdx: 0, testScore: 0,
+  planData: null, planDone: {},
+  saved: []
+};
+
+// Per-language storage keys
+function lk(key) { return `lb_${state.lang}_${key}`; }
+
+function saveCurrentLangState() {
+  try {
+    localStorage.setItem(lk('saved'),    JSON.stringify(state.saved));
+    localStorage.setItem(lk('done'),     JSON.stringify(state.planDone));
+    localStorage.setItem(lk('history'),  JSON.stringify(state.testHistory||[]));
+    localStorage.setItem(lk('errors'),   JSON.stringify(state.errorMemory||[]));
+    localStorage.setItem(lk('startdate'),state.planStartDate||'');
+    if(state.planData) localStorage.setItem(lk('plan'), JSON.stringify(state.planData));
+    else localStorage.removeItem(lk('plan'));
+  } catch(e){}
+}
+
+function loadLangState(langVal) {
+  const prefix = `lb_${langVal}_`;
+  try { state.saved       = JSON.parse(localStorage.getItem(prefix+'saved')   ||'[]'); } catch(e){ state.saved=[]; }
+  try { state.planDone    = JSON.parse(localStorage.getItem(prefix+'done')    ||'{}'); } catch(e){ state.planDone={}; }
+  try { state.testHistory = JSON.parse(localStorage.getItem(prefix+'history') ||'[]'); } catch(e){ state.testHistory=[]; }
+  try { state.errorMemory = JSON.parse(localStorage.getItem(prefix+'errors')  ||'[]'); } catch(e){ state.errorMemory=[]; }
+  try { state.planStartDate = localStorage.getItem(prefix+'startdate')||null; } catch(e){ state.planStartDate=null; }
+  try { const p = localStorage.getItem(prefix+'plan'); state.planData = p ? JSON.parse(p) : null; } catch(e){ state.planData=null; }
+  state.planLevel = state.testHistory.length ? getLevelFromPct(state.testHistory[0].pct) : '初级';
+}
+
+// Initial load for default lang
+loadLangState('English');
+
+// INIT UI
+function init() {
+  // Tags
+  const tEl = document.getElementById('learn-tags');
+  if(tEl) tEl.innerHTML = TOPICS.map(t=>`<button class="chip" onclick="quickTopic('${t}')">${t}</button>`).join('');
+  // Level grid (plan page)
+  const lg = document.getElementById('level-grid');
+  if(lg) lg.innerHTML = LEVELS.map(l=>`<div class="level-card ${l.val===state.planLevel?'sel':''}" onclick="selLevel('${l.val}',this)"><div class="level-name">${l.name}</div><div class="level-desc">${l.desc}</div></div>`).join('');
+  // Lang options
+  renderLangOptions();
+  // If plan exists show it
+  if(state.planData) { document.getElementById('plan-setup-view').style.display='none'; renderPlan(); }
+  renderSaved();
+  renderDaily();
+  renderPlanSetupBanner();
+  updateHeader();
+  initTestPage();
+  // Defer home profile render to next frame so the page is fully visible first
+  requestAnimationFrame(() => renderHomeProfile());
+}
+
+function updateHeader() {
+  document.getElementById('header-lang-flag').textContent = state.langFlag;
+  document.getElementById('header-lang-name').textContent = state.langName;
+}
+
+function goPage(name, idx) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(idx !== undefined && idx <= 3) document.querySelectorAll('.tab-item')[idx].classList.add('active');
+  if(name==='saved') renderSaved();
+  if(name==='daily') { state.dailyDay = null; state.viewDay = null; renderDaily(); }
+  if(name==='plan' && state.planData) renderPlan();
+  if(name==='learn') renderHomeProfile();
+  if(name==='settings') {} // no special action needed
+}
+
+function switchPlanTab(tab, btn) {
+  document.querySelectorAll('.subtabs .stab').forEach(b=>{
+    if(b.id&&b.id.startsWith('ptab-')) b.classList.remove('active');
+  });
+  btn.classList.add('active');
+  document.getElementById('plan-subpage').style.display = tab==='plan' ? 'block' : 'none';
+  document.getElementById('test-subpage').style.display = tab==='test' ? 'block' : 'none';
+  if(tab==='test') initTestPage();
+  if(tab==='plan') {
+    if(state.planData) renderPlan();
+    renderPlanSetupBanner();
+  }
+}
+
+function renderPlanSetupBanner() {
+  const banner = document.getElementById('plan-test-banner');
+  if(!banner) return;
+  if(state.testHistory.length) {
+    const lv = getScoreLevel(state.testHistory[0].pct);
+    banner.innerHTML = `<div style="background:var(--success-bg);border-radius:var(--radius-sm);
+      padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;">
+      <div style="flex:1;font-size:13px;color:var(--success);">
+        ✓ 测试成绩已就绪 · 雅思约 ${lv.ielts} · ${lv.label}
+      </div>
+      <button class="btn btn-ghost btn-sm"
+        onclick="switchPlanTab('test',document.getElementById('ptab-test'))">重新测试</button>
+    </div>`;
+  } else {
+    banner.innerHTML = `<div style="background:var(--warn-bg);border-radius:var(--radius-sm);
+      padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;">
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:600;color:var(--warn);margin-bottom:2px;">建议先做一次测试</div>
+        <div style="font-size:12px;color:var(--warn);opacity:.8;">AI 根据你的成绩定制计划，效果更精准</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" style="border-color:var(--warn);color:var(--warn);flex-shrink:0;"
+        onclick="switchPlanTab('test',document.getElementById('ptab-test'))">去测试 →</button>
+    </div>`;
+  }
+}
+
+// XP & LEVEL SYSTEM
+const XP_PER_CHECKIN = 10;
+const XP_PER_TEST    = 30;
+const XP_PER_CONV    = 15;
+const XP_LEVELS = [
+  { min:0,    max:99,  name:'入门学员',  color:'#888', emoji:'🌱' },
+  { min:100,  max:249, name:'初级学习者', color:'#4a9',  emoji:'📗' },
+  { min:250,  max:499, name:'进阶学习者', color:'#378ADD',emoji:'📘' },
+  { min:500,  max:849, name:'熟练使用者', color:'#8B5CF6',emoji:'⚡' },
+  { min:850,  max:1299,name:'流利达人',   color:'#F59E0B',emoji:'🔥' },
+  { min:1300, max:Infinity, name:'语言大师', color:'#EF4444', emoji:'👑' },
+];
+
+function calcXP() {
+  // Use unique calendar dates for checkin XP
+  const uniqueDates = new Set(
+    Object.values(state.planDone)
+      .filter(v => typeof v === 'string' && v.length === 10)
+  );
+  const checkins = uniqueDates.size * XP_PER_CHECKIN;
+  const tests    = (state.testHistory?.length||0) * XP_PER_TEST;
+  const convs    = (state.errorMemory?.length||0) * 2 + (state.testHistory?.length||0) * XP_PER_CONV;
+  return checkins + tests + convs;
+}
+
+function getLevelInfo(xp) {
+  const lv = XP_LEVELS.findLast(l => xp >= l.min) || XP_LEVELS[0];
+  const idx = XP_LEVELS.indexOf(lv);
+  const next = XP_LEVELS[idx+1];
+  const progress = next
+    ? Math.round((xp - lv.min) / (next.min - lv.min) * 100)
+    : 100;
+  const xpToNext = next ? next.min - xp : 0;
+  return { ...lv, idx: idx+1, total: XP_LEVELS.length, progress, xpToNext, xp };
+}
+
+
+function renderHomeProfile() {
+  try {
+  const el = document.getElementById('home-profile-out');
+  if(!el) return;
+
+  const nickname = state.nickname || '';
+  const avatar = state.avatar || '🙂';
+
+  if(!nickname) {
+    // First time — show welcome, trigger nickname modal after short delay
+    el.innerHTML = `
+      <div class="card" style="margin-bottom:4px;text-align:center;padding:24px 16px;">
+        <div style="font-size:48px;margin-bottom:10px;">👋</div>
+        <div style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:6px;">欢迎来到 Polypal</div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:16px;">先设置你的头像和昵称</div>
+        <button class="btn btn-primary" onclick="openProfileModal()">开始设置</button>
+      </div>`;
+    return;
+  }
+
+  const xp = calcXP();
+  const lv = getLevelInfo(xp);
+  const total = Object.keys(state.planDone).length;
+  const streak = calcStreak();
+
+  const isDoneToday = (() => {
+    if(!state.planData) return false;
+    const allDays = state.planData.weeks.flatMap(w=>w.days);
+    const nextDay = allDays.find(d=>!state.planDone[d.day]);
+    return nextDay ? !!state.planDone[nextDay.day-1] : true;
+  })();
+
+  const nextDay = state.planData
+    ? state.planData.weeks.flatMap(w=>w.days).find(d=>!state.planDone[d.day])
+    : null;
+
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;gap:14px;padding:4px 0 16px;">
+      <!-- Emoji avatar -->
+      <button onclick="openProfileModal()"
+        style="width:60px;height:60px;border-radius:50%;flex-shrink:0;
+        background:var(--bg2);border:2px solid var(--border2);
+        font-size:30px;display:flex;align-items:center;justify-content:center;
+        cursor:pointer;transition:all .15s;">
+        ${avatar}
+      </button>
+      <!-- Info -->
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+          <span style="font-size:17px;font-weight:700;color:var(--text);">${nickname}</span>
+          <span style="font-size:12px;font-weight:500;padding:2px 9px;border-radius:20px;
+            background:var(--accent-bg);color:var(--accent-text);">${lv.emoji} ${lv.name}</span>
+        </div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">
+          ${xp} XP · 🔥 ${streak}天连续 · 📅 ${total}/30天
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="flex:1;background:var(--bg3);border-radius:4px;height:5px;">
+            <div style="height:5px;border-radius:4px;background:var(--accent);
+              width:${lv.progress}%;transition:width .5s;"></div>
+          </div>
+          <span style="font-size:10px;color:var(--text3);white-space:nowrap;">
+            ${lv.xpToNext > 0 ? `升级还需 ${lv.xpToNext} XP` : '已满级 👑'}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick checkin strip -->
+    ${nextDay ? `
+    <div style="border-radius:var(--radius-sm);padding:11px 14px;margin-bottom:4px;
+      display:flex;align-items:center;gap:10px;
+      background:${state.planDone[nextDay.day]?'var(--success-bg)':'var(--accent-bg)'};
+      border:1px solid ${state.planDone[nextDay.day]?'var(--success-bg)':'var(--accent-bg)'};">
+      <div style="flex:1;">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.3px;margin-bottom:2px;
+          color:${state.planDone[nextDay.day]?'var(--success)':'var(--accent-text)'};">
+          ${state.planDone[nextDay.day]?'✓ 今日已打卡':'Day '+nextDay.day+' · 今日任务'}
+        </div>
+        <div style="font-size:13px;
+          color:${state.planDone[nextDay.day]?'var(--success)':'var(--accent-text)'};">
+          ${nextDay.topic}
+        </div>
+      </div>
+      ${!state.planDone[nextDay.day]
+        ? `<button onclick="goPage('daily',2)"
+            style="flex-shrink:0;padding:8px 16px;border-radius:20px;
+            background:var(--accent);color:#fff;border:none;
+            font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;">
+            去练习
+           </button>`
+        : `<span style="font-size:24px;">✅</span>`}
+    </div>` : !state.planData ? `
+    <div style="background:var(--bg2);border-radius:var(--radius-sm);padding:11px 14px;
+      margin-bottom:4px;">
+      ${state.testHistory.length === 0 ? `
+      <div style="font-size:13px;color:var(--text2);margin-bottom:10px;">先测一下你的水平，AI 才能定制最适合你的计划</div>
+      <button class="btn btn-primary btn-block btn-sm" onclick="goPage('plan',1);setTimeout(()=>switchPlanTab('test',document.getElementById('ptab-test')),50)">
+        开始水平测试 →
+      </button>` : `
+      <div style="font-size:13px;color:var(--text2);margin-bottom:10px;">
+        测试成绩已就绪，告诉 AI 你的目标，生成专属计划
+      </div>
+      <button class="btn btn-primary btn-block btn-sm" onclick="goPage('plan',1)">
+        制定我的计划 →
+      </button>`}
+    </div>` : `
+    <div style="background:var(--success-bg);border-radius:var(--radius-sm);padding:11px 14px;margin-bottom:4px;text-align:center;font-size:13px;color:var(--success);font-weight:600;">
+      🎉 30天计划全部完成！
+    </div>`}
+
+    <!-- Motivation nudge: show when plan exists but today not checked in -->
+    ${state.planData && nextDay && !state.planDone[nextDay.day] ? `
+    <div id="home-nudge" style="margin-top:8px;padding:10px 14px;
+      border-left:3px solid var(--accent);border-radius:var(--radius-sm);
+      background:var(--bg2);">
+      <div style="font-size:13px;color:var(--text2);line-height:1.5;" id="nudge-text">
+        ${getMotivationNudge(streak, total, state.planLevel)}
+      </div>
+    </div>` : ''}`;
+  } catch(e) {
+    console.error('renderHomeProfile error:', e);
+    const el = document.getElementById('home-profile-out');
+    if(el) el.innerHTML = '<div style="padding:8px;font-size:12px;color:var(--text3);">加载中…</div>';
+  }
+}
+
+function getMotivationNudge(streak, total, level) {
+  const msgs = [
+    `今天的 ${state.langName} 还没打卡，${streak > 0 ? streak+'天的连击等你续上 🔥' : '迈出第一步最难，就今天！'}`,
+    `${state.langName} 学习不打烊，今日任务还差一步完成 ✨`,
+    `${total > 0 ? '已经打卡 '+total+' 天了' : '今天是个好的开始'}，今天也不例外吧？`,
+    `${streak > 2 ? '你已经连续 '+streak+' 天了！别让今天断掉 💪' : '每天10分钟，积累比你想象的快 📈'}`,
+    `${state.lang} 每天都在用的人，今天你的进度还是 0% ⏰`,
+  ];
+  const idx = (new Date().getDate() + total) % msgs.length;
+  return msgs[idx];
+}
+
+// EMOJI AVATARS
+const EMOJI_LIST = ['🙂','😎','🤩','🥳','🧑','👩','🧔','🧑‍💻','🧑‍🎓','🧑‍🚀','🦊','🐼','🐨','🦁','🐯','🐸','🦄','🐙','🦋','🌟','🔥','⚡','🎯','🎮','🎸'];
+
+function openProfileModal() {
+  const existing = document.getElementById('profile-modal');
+  if(existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'profile-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;display:flex;align-items:flex-end;';
+  modal.innerHTML = `
+    <div style="width:100%;background:var(--surface);border-radius:20px 20px 0 0;
+      padding:20px 20px calc(var(--safe-b)+24px);max-height:85vh;overflow-y:auto;">
+      <div style="width:40px;height:4px;border-radius:2px;background:var(--border2);margin:0 auto 16px;"></div>
+      <div style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:16px;">设置头像和昵称</div>
+
+      <!-- Current avatar preview -->
+      <div style="text-align:center;margin-bottom:16px;">
+        <div id="avatar-preview" style="font-size:52px;line-height:1;">${state.avatar||'🙂'}</div>
+      </div>
+
+      <!-- Emoji grid -->
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:20px;">
+        ${EMOJI_LIST.map(e=>`
+          <button onclick="selectEmoji('${e}',this)"
+            style="font-size:26px;border-radius:10px;border:2px solid ${(state.avatar||'🙂')===e?'var(--accent)':'transparent'};
+            background:${(state.avatar||'🙂')===e?'var(--accent-bg)':'var(--bg2)'};
+            padding:6px;cursor:pointer;transition:all .15s;aspect-ratio:1;
+            display:flex;align-items:center;justify-content:center;">
+            ${e}
+          </button>`).join('')}
+      </div>
+
+      <!-- Nickname input -->
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px;">昵称</div>
+      <input type="text" id="modal-nickname" value="${state.nickname||''}"
+        placeholder="输入你的昵称…" maxlength="12"
+        style="margin-bottom:16px;font-size:15px;"/>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <button class="btn btn-ghost" onclick="document.getElementById('profile-modal').remove()">取消</button>
+        <button class="btn btn-primary" onclick="saveProfile()">保存</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  // Close on backdrop
+  modal.addEventListener('click', e=>{ if(e.target===modal) modal.remove(); });
+}
+
+function selectEmoji(e, btn) {
+  state.avatar = e;
+  document.getElementById('avatar-preview').textContent = e;
+  document.querySelectorAll('#profile-modal button[onclick*="selectEmoji"]').forEach(b=>{
+    b.style.border = '2px solid transparent';
+    b.style.background = 'var(--bg2)';
+  });
+  btn.style.border = '2px solid var(--accent)';
+  btn.style.background = 'var(--accent-bg)';
+}
+
+function saveProfile() {
+  const inp = document.getElementById('modal-nickname');
+  const name = inp ? inp.value.trim() : '';
+  if(!name) { if(inp) inp.focus(); return; }
+  state.nickname = name;
+  if(!state.avatar) state.avatar = '🙂';
+  try {
+    localStorage.setItem('lb_nickname', state.nickname);
+    localStorage.setItem('lb_avatar', state.avatar);
+  } catch(e){}
+  document.getElementById('profile-modal')?.remove();
+  renderHomeProfile();
+}
+
+// LANG MODAL
+function openLangModal() {
+  renderLangOptions();
+  document.getElementById('lang-modal').classList.add('open');
+}
+function closeLangModal(e) { if(e.target===document.getElementById('lang-modal')) document.getElementById('lang-modal').classList.remove('open'); }
+
+function renderLangOptions() {
+  document.getElementById('lang-options').innerHTML = LANGS.map(l=>{
+    const isCurrent = l.val === state.lang;
+    // Read progress for this language
+    let progress = '';
+    try {
+      const done = JSON.parse(localStorage.getItem(`lb_${l.val}_done`)||'{}');
+      const hist = JSON.parse(localStorage.getItem(`lb_${l.val}_history`)||'[]');
+      const doneCount = Object.keys(done).length;
+      const lastScore = hist.length ? hist[0].pct : null;
+      if(doneCount > 0 || lastScore !== null) {
+        progress = `<div style="font-size:11px;color:var(--text3);margin-top:2px;">`;
+        if(doneCount > 0) progress += `📅 ${doneCount}/30天`;
+        if(lastScore !== null) progress += ` ${doneCount>0?'·':''} 测试 ${lastScore}%`;
+        progress += `</div>`;
+      }
+    } catch(e){}
+    return `<div class="lang-option ${isCurrent?'sel':''}" onclick="setLang('${l.val}','${l.name}','${l.flag}')">
+      <div>
+        <div class="lang-option-name">${l.flag} ${l.name}</div>
+        ${progress}
+      </div>
+      ${isCurrent ? '<span style="color:var(--accent);font-size:16px;">✓</span>' : ''}
+    </div>`;
+  }).join('');
+}
+
+function setLang(val, name, flag) {
+  if(val === state.lang) {
+    document.getElementById('lang-modal').classList.remove('open');
+    return;
+  }
+  // Save current language's progress before switching
+  saveCurrentLangState();
+
+  // Switch
+  state.lang = val; state.langName = name; state.langFlag = flag;
+  try { localStorage.setItem('lb_current_lang', JSON.stringify({val,name,flag})); } catch(e){}
+
+  // Load new language's progress
+  loadLangState(val);
+
+  // Reset session state
+  state.convHistory = []; state.dailyConv = null;
+  state.testQ = []; state.testIdx = 0; state.testScore = 0;
+  state.dailyDay = null; state.dailyTopic = '';
+
+  updateHeader();
+  renderLangOptions();
+  document.getElementById('lang-modal').classList.remove('open');
+
+  // Refresh current page
+  const activePage = document.querySelector('.page.active');
+  if(activePage) {
+    const pid = activePage.id.replace('page-','');
+    const idx = ['learn','test','plan','daily','saved','settings'].indexOf(pid);
+    if(pid==='plan') {
+      if(state.planData) { document.getElementById('plan-setup-view').style.display='none'; document.getElementById('plan-result-view').style.display='block'; renderPlan(); }
+      else { document.getElementById('plan-setup-view').style.display='block'; document.getElementById('plan-result-view').style.display='none'; }
+      const lg = document.getElementById('level-grid');
+      if(lg) lg.querySelectorAll('.level-card').forEach(x=>x.classList.toggle('sel', x.querySelector('.level-name')?.textContent===state.planLevel));
+    }
+    if(pid==='daily') renderDaily();
+    if(pid==='saved') renderSaved();
+    if(pid==='test') initTestPage();
+    // Clear learn output
+    if(pid==='learn') { document.getElementById('learn-out').style.display='none'; }
+  }
+}
+
+// LEARN
+function quickTopic(t) { document.getElementById('learn-input').value=t; doLearn(); }
+function switchSub(tab, btn) {
+  state.learnSubTab=tab;
+  document.querySelectorAll('.stab').forEach(x=>x.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('sub-phrases').style.display = tab==='phrases'?'block':'none';
+  document.getElementById('sub-dialogue').style.display = tab==='dialogue'?'block':'none';
+}
+
+async function doLearn() {
+  const topic = document.getElementById('learn-input').value.trim();
+  if(!topic) return;
+  state.curTopic = topic;
+  document.getElementById('learn-out').style.display='block';
+  document.querySelectorAll('.stab')[0].click();
+  document.getElementById('sub-phrases').innerHTML = loading();
+  document.getElementById('sub-dialogue').innerHTML = loading();
+  apiCall(
+    `You help learn ${state.lang}. Return ONLY valid JSON: {"phrases":[{"en":"phrase","cn":"中文意思","note":"使用场景（中文，一句）"}]}\n10 practical phrases. Simple vocabulary.`,
+    `话题：${topic}`,
+    1000,
+    data => {
+      const p = data.phrases;
+      document.getElementById('sub-phrases').innerHTML = '<div class="card">' +
+        p.map(x=>{
+          const es=x.en.replace(/'/g,"\\'"), cs=x.cn.replace(/'/g,"\\'");
+          const sv = isSaved(x.en);
+          return `<div class="phrase-row">
+            <div class="phrase-body">
+              <div class="phrase-en">${x.en}</div>
+              <div class="phrase-cn">${x.cn}</div>
+              ${x.note?`<div class="phrase-note">${x.note}</div>`:''}
+            </div>
+            <button class="star-btn ${sv?'on':''}" onclick="toggleSave('${es}','${cs}','${topic}',this)">${sv?'★':'☆'}</button>
+          </div>`;
+        }).join('')+'</div>';
+    },
+    () => { document.getElementById('sub-phrases').innerHTML = errCard(); }
+  );
+  apiCall(
+    `You help learn ${state.lang}. Return ONLY valid JSON: {"title":"场景（中文）","lines":[{"speaker":"A","en":"sentence","cn":"中文"}]}\n8-10 line dialogue. A=learner B=local. Simple natural language.`,
+    `话题：${topic}`,
+    1000,
+    data => {
+      document.getElementById('sub-dialogue').innerHTML = `<div class="card">
+        <div class="card-title">${data.title}</div>
+        ${data.lines.map(l=>`<div class="bubble-wrap ${l.speaker==='B'?'r':''}">
+          <div class="blbl">${l.speaker==='A'?'你':'对方'}</div>
+          <div class="bubble ${l.speaker==='B'?'r2':'l'}">
+            <div>${l.en}</div><div class="bubble-cn">${l.cn}</div>
+          </div>
+        </div>`).join('')}
+      </div>`;
+    },
+    () => { document.getElementById('sub-dialogue').innerHTML = errCard(); }
+  );
+}
+
+// TEST — combined 15 questions (5 vocab + 5 scene + 5 listen), auto-level from history
+function getLevelFromPct(pct) {
+  if(pct >= 70) return '高级';
+  if(pct >= 40) return '中级';
+  return '初级';
+}
+
+function initTestPage() {
+  // Level banner
+  const banner = document.getElementById('test-level-banner');
+  if(state.testHistory.length) {
+    const latest = state.testHistory[0];
+    const lv = getScoreLevel(latest.pct);
+    const detectedLevel = getLevelFromPct(latest.pct);
+    banner.style.display = 'block';
+    banner.innerHTML = `<div style="background:var(--accent-bg);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;">
+      <div style="flex:1;">
+        <div style="font-size:12px;font-weight:600;color:var(--accent-text);">当前测评等级：${detectedLevel}</div>
+        <div style="font-size:12px;color:var(--accent-text);opacity:.8;">上次 ${latest.pct}% · 雅思约 ${lv.ielts} · ${new Date(latest.date).toLocaleDateString('zh',{month:'numeric',day:'numeric'})}</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="showHistory()">历史 →</button>
+    </div>`;
+    // Also auto-fill plan level
+    state.planLevel = detectedLevel;
+  }
+  // History preview (last 3)
+  const prev = document.getElementById('test-history-preview');
+  if(state.testHistory.length) {
+    prev.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+      <div style="font-size:13px;font-weight:600;color:var(--text);">最近记录</div>
+      <button class="btn btn-ghost btn-sm" onclick="showHistory()">全部 →</button>
+    </div>` +
+    state.testHistory.slice(0,3).map((r,i)=>{
+      const lv = getScoreLevel(r.pct);
+      const prev2 = state.testHistory[i+1];
+      const delta = prev2 ? r.pct - prev2.pct : null;
+      return `<div class="card" style="margin-bottom:8px;padding:12px 14px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="flex:1;">
+            <div style="font-size:14px;font-weight:600;color:var(--text);">${r.pct}% <span style="font-weight:400;color:var(--text3);font-size:13px;">· ${lv.label}</span></div>
+            <div style="font-size:12px;color:var(--text3);margin-top:2px;">${new Date(r.date).toLocaleDateString('zh',{month:'long',day:'numeric'})}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:13px;font-weight:600;color:var(--accent);">雅思 ${lv.ielts}</div>
+            ${delta!==null?`<div style="font-size:11px;color:${delta>=0?'var(--success)':'var(--danger)'};">${delta>=0?'▲':'▼'}${Math.abs(delta)}%</div>`:''}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  } else {
+    prev.innerHTML = '';
+  }
+}
+
+async function startTest() {
+  state.testQ=[]; state.testIdx=0; state.testScore=0;
+  state.testSectionScores = {vocab:0, scene:0, listen:0};
+  document.getElementById('test-home-view').style.display='none';
+  document.getElementById('test-q-view').style.display='block';
+  document.getElementById('test-res-view').style.display='none';
+  document.getElementById('test-q-view').innerHTML = loading('正在出题，稍等…');
+
+  const diff = state.testHistory.length ? getLevelFromPct(state.testHistory[0].pct) : '中级';
+
+  apiCall(
+    `Generate a combined ${state.lang} language test at ${diff} level with exactly 15 questions:
+- 5 vocabulary MCQ (type:"vocab"): show a ${state.lang} word/phrase, give 4 Chinese meaning options
+- 5 situational fill-in-blank (type:"scene"): show a ${state.lang} dialogue with one blank [____], give 4 ${state.lang} options  
+- 5 listening comprehension (type:"listen"): show a ${state.lang} sentence as if spoken aloud, give 4 Chinese meaning options
+Return ONLY JSON: {"questions":[{"type":"vocab","q":"question text","options":["A","B","C","D"],"answer":0,"explain":"解析（中文，一句）"}]}
+answer = correct index 0-3. Mix difficulty within each section. Total must be exactly 15 questions.`,
+    'Generate now.',
+    2500,
+    data => {
+      state.testQ = data.questions.slice(0,15);
+      state.testDiff = diff;
+      renderQ();
+    },
+    () => { document.getElementById('test-q-view').innerHTML = errCard('出题失败，请检查 API Key 后重试'); }
+  );
+}
+
+function renderQ() {
+  if(state.testIdx >= state.testQ.length) { showTestResult(); return; }
+  const q = state.testQ[state.testIdx];
+  const sectionName = {vocab:'词汇理解', scene:'情景填空', listen:'听力理解'}[q.type];
+  const sectionIcon = {vocab:'📝', scene:'🎭', listen:'🔊'}[q.type];
+  const sectionNum = state.testQ.slice(0, state.testIdx).filter(x=>x.type===q.type).length + 1;
+  const sectionTotal = state.testQ.filter(x=>x.type===q.type).length;
+  const overallPct = Math.round((state.testIdx / state.testQ.length) * 100);
+
+  document.getElementById('test-q-view').innerHTML = `
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span class="badge badge-blue">${sectionIcon} ${sectionName} ${sectionNum}/${sectionTotal}</span>
+        <span style="font-size:13px;color:var(--text3);">${state.testIdx+1} / ${state.testQ.length}</span>
+      </div>
+      <div class="prog-wrap"><div class="prog-fill" style="width:${overallPct}%"></div></div>
+    </div>
+    <div class="card" style="margin-bottom:12px;">
+      ${q.type==='listen'
+        ? `<div style="text-align:center;padding:8px 0 4px;">
+            <button onclick="speakText(this)" data-text="${q.q.replace(/"/g,'&quot;')}"
+              style="display:inline-flex;align-items:center;gap:8px;background:var(--accent-bg);color:var(--accent-text);border:none;border-radius:40px;padding:12px 24px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;">
+              <span style="font-size:20px;">🔊</span> 点击朗读
+            </button>
+            <div style="margin-top:14px;">
+              <button onclick="toggleListenText(this)" data-text="${q.q.replace(/"/g,'&quot;')}"
+                style="font-size:13px;color:var(--text3);background:none;border:1px dashed var(--border2);border-radius:8px;padding:6px 14px;cursor:pointer;font-family:inherit;">
+                显示原文
+              </button>
+              <div id="listen-text" style="display:none;margin-top:10px;font-size:16px;font-weight:500;color:var(--text);line-height:1.6;padding:10px 14px;background:var(--bg2);border-radius:var(--radius-sm);">${q.q}</div>
+            </div>
+          </div>`
+        : `<div style="font-size:15px;font-weight:500;line-height:1.7;color:var(--text);">${q.q}</div>`
+      }
+    </div>
+    ${q.options.map((o,i)=>`<button class="opt" id="opt-${i}" onclick="answerQ(${i})">
+      <span style="font-weight:600;margin-right:8px;color:var(--accent);">${'ABCD'[i]}</span>${o}
+    </button>`).join('')}
+    <div id="q-explain" style="display:none;"></div>
+    <button id="q-next" style="display:none;" class="btn btn-primary btn-block" style="margin-top:12px;" onclick="nextQ()">
+      ${state.testIdx < state.testQ.length-1 ? '下一题 →' : '查看结果 →'}
+    </button>`;
+
+  // Auto-speak on listen questions
+  if(q.type === 'listen') {
+    setTimeout(() => speakText(null, q.q), 400);
+  }
+}
+
+function speakText(btn, textOverride) {
+  const text = textOverride || btn.dataset.text;
+  if(!text) return;
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  // Pick voice matching current learning language
+  const langMap = { English:'en', French:'fr', Spanish:'es', Japanese:'ja', Korean:'ko', German:'de' };
+  utter.lang = langMap[state.lang] || 'en';
+  utter.rate = 0.9;
+  if(btn) {
+    btn.textContent = '🔊 朗读中…';
+    btn.disabled = true;
+    utter.onend = () => { btn.innerHTML = '<span style="font-size:20px;">🔊</span> 再听一次'; btn.disabled = false; };
+  }
+  window.speechSynthesis.speak(utter);
+}
+
+function toggleListenText(btn) {
+  const box = document.getElementById('listen-text');
+  if(!box) return;
+  if(box.style.display === 'none') {
+    box.style.display = 'block';
+    btn.textContent = '隐藏原文';
+  } else {
+    box.style.display = 'none';
+    btn.textContent = '显示原文';
+  }
+}
+
+function answerQ(i) {
+  const q = state.testQ[state.testIdx];
+  for(let x=0;x<4;x++){
+    const b=document.getElementById('opt-'+x);
+    if(b){b.disabled=true; if(x===q.answer)b.classList.add('correct'); else if(x===i&&i!==q.answer)b.classList.add('wrong');}
+  }
+  if(i===q.answer){
+    state.testScore++;
+    if(q.type) state.testSectionScores[q.type] = (state.testSectionScores[q.type]||0)+1;
+  }
+  const ex = document.getElementById('q-explain');
+  ex.style.display='block';
+  ex.innerHTML=`<div style="background:var(--bg2);border-radius:var(--radius-sm);padding:12px 14px;margin:10px 0;font-size:13px;color:var(--text2);">${q.explain||''}</div>`;
+  document.getElementById('q-next').style.display='block';
+}
+function nextQ() { state.testIdx++; renderQ(); }
+
+// SCORE MAPPING
+const IELTS_MAP = [
+  {min:0,  max:19,  ielts:'2.0', toefl:'0',  cefr:'A1', label:'入门'},
+  {min:20, max:39,  ielts:'3.0', toefl:'32', cefr:'A2', label:'基础'},
+  {min:40, max:54,  ielts:'4.0', toefl:'45', cefr:'B1', label:'初中级'},
+  {min:55, max:64,  ielts:'5.0', toefl:'59', cefr:'B1', label:'中级'},
+  {min:65, max:74,  ielts:'5.5', toefl:'72', cefr:'B2', label:'中高级'},
+  {min:75, max:82,  ielts:'6.0', toefl:'83', cefr:'B2', label:'良好'},
+  {min:83, max:89,  ielts:'6.5', toefl:'94', cefr:'C1', label:'较强'},
+  {min:90, max:94,  ielts:'7.0', toefl:'102','cefr':'C1', label:'优秀'},
+  {min:95, max:97,  ielts:'7.5', toefl:'110','cefr':'C1', label:'很强'},
+  {min:98, max:100, ielts:'8.0+',toefl:'114','cefr':'C2', label:'卓越'},
+];
+
+function getScoreLevel(pct) {
+  return IELTS_MAP.find(r => pct >= r.min && pct <= r.max) || IELTS_MAP[0];
+}
+
+function saveTestRecord(pct) {
+  const record = {
+    date: new Date().toISOString(), pct,
+    score: state.testScore, total: state.testQ.length,
+    type: state.testType, diff: state.testDiff, lang: state.lang
+  };
+  state.testHistory.unshift(record);
+  try { localStorage.setItem(lk('history'), JSON.stringify(state.testHistory)); } catch(e){}
+  showXPToast(XP_PER_TEST, '测试+'+XP_PER_TEST+' XP');
+}
+
+function showTestResult() {
+  // Ensure test subpage is visible
+  const testSubpage = document.getElementById('test-subpage');
+  const planSubpage = document.getElementById('plan-subpage');
+  if(testSubpage) testSubpage.style.display = 'block';
+  if(planSubpage) planSubpage.style.display = 'none';
+  document.getElementById('ptab-plan')?.classList.remove('active');
+  document.getElementById('ptab-test')?.classList.add('active');
+
+  document.getElementById('test-q-view').style.display='none';
+  document.getElementById('test-res-view').style.display='block';
+
+  const pct = Math.round(state.testScore / state.testQ.length * 100);
+  saveTestRecord(pct);
+  const level = getScoreLevel(pct);
+  const detectedLevel = getLevelFromPct(pct);
+  state.planLevel = detectedLevel;
+  document.querySelectorAll('#level-grid .level-card').forEach(x=>{
+    x.classList.toggle('sel', x.querySelector('.level-name')?.textContent===detectedLevel);
+  });
+
+  const isFirst = state.testHistory.length === 1;
+  const prev = state.testHistory[1];
+  const delta = prev ? pct - prev.pct : null;
+
+  const congratsMsg = isFirst
+    ? `首次测评完成！你的${state.langName}水平已建立基准 🎉`
+    : delta > 0
+      ? `比上次提高了 ${delta}%，继续保持！🔥`
+      : delta < 0
+        ? `比上次低了 ${Math.abs(delta)}%，分析弱点再出发 💪`
+        : `和上次持平，稳定就是进步 👍`;
+
+  const deltaHtml = delta !== null
+    ? `<span style="font-size:13px;font-weight:600;color:${delta>=0?'var(--success)':'var(--danger)'};">${delta>=0?'▲':'▼'} ${Math.abs(delta)}% 较上次</span>`
+    : `<span style="font-size:12px;color:var(--text3);">首次测试，已建立基准</span>`;
+
+  const sc = state.testSectionScores||{};
+  const sectionResults = [
+    {key:'vocab',name:'词汇',icon:'📝',total:5},
+    {key:'scene',name:'情景',icon:'🎭',total:5},
+    {key:'listen',name:'听力',icon:'🔊',total:5},
+  ].map(s=>({...s, got:sc[s.key]||0, pct:Math.round((sc[s.key]||0)/s.total*100)}));
+
+  const strongest = [...sectionResults].sort((a,b)=>b.pct-a.pct)[0];
+  const weakest   = [...sectionResults].sort((a,b)=>a.pct-b.pct)[0];
+
+  const chartBars = state.testHistory.slice(0,8).reverse().map((r,i,arr)=>{
+    const isLast = i===arr.length-1;
+    return `<div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;min-width:0;">
+      <div style="font-size:9px;color:var(--text3);">${r.pct}%</div>
+      <div style="width:100%;background:${isLast?'var(--accent)':'var(--bg3)'};border-radius:3px 3px 0 0;height:${Math.max(6,Math.round(r.pct*1.1))}px;"></div>
+      <div style="font-size:9px;color:var(--text3);text-align:center;">${new Date(r.date).toLocaleDateString('zh',{month:'numeric',day:'numeric'})}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('test-res-view').innerHTML = `
+    <div style="background:var(--accent-bg);border-radius:var(--radius);padding:18px 16px;margin-bottom:14px;text-align:center;">
+      <div style="font-size:32px;margin-bottom:8px;">${isFirst?'🎉':delta>0?'🚀':delta<0?'💪':'⭐'}</div>
+      <div style="font-size:16px;font-weight:600;color:var(--accent-text);margin-bottom:4px;">测试完成！</div>
+      <div style="font-size:13px;color:var(--accent-text);opacity:.85;line-height:1.5;">${congratsMsg}</div>
+    </div>
+
+    <div class="result-score" style="margin-bottom:14px;">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">综合得分 · 自动定级 <strong style="color:var(--text);">${detectedLevel}</strong></div>
+      <div class="score-big">${state.testScore}<span class="score-denom">/${state.testQ.length}</span></div>
+      <div style="margin:8px 0;">${deltaHtml}</div>
+      <div class="prog-wrap" style="margin:10px 0 6px;"><div class="prog-fill" style="width:${pct}%"></div></div>
+      <div style="font-size:13px;color:var(--text3);">正确率 ${pct}%</div>
+    </div>
+
+    <div class="card" style="margin-bottom:12px;">
+      <div class="card-title">对标国际考试</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px;">
+        <div style="text-align:center;padding:12px 6px;background:var(--bg2);border-radius:var(--radius-sm);">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">雅思 IELTS</div>
+          <div style="font-size:26px;font-weight:700;color:var(--text);">${level.ielts}</div>
+        </div>
+        <div style="text-align:center;padding:12px 6px;background:var(--bg2);border-radius:var(--radius-sm);">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">托福 TOEFL</div>
+          <div style="font-size:26px;font-weight:700;color:var(--text);">${level.toefl}</div>
+        </div>
+        <div style="text-align:center;padding:12px 6px;background:var(--bg2);border-radius:var(--radius-sm);">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">CEFR 等级</div>
+          <div style="font-size:26px;font-weight:700;color:var(--text);">${level.cefr}</div>
+        </div>
+      </div>
+      <div style="background:var(--accent-bg);border-radius:var(--radius-sm);padding:10px 14px;">
+        <div style="font-size:13px;font-weight:600;color:var(--accent-text);margin-bottom:3px;">${level.label}水平</div>
+        <div style="font-size:12px;color:var(--accent-text);opacity:.85;">
+          ${level.cefr==='A1'?'刚起步，先打好基础词汇和简单句型':
+            level.cefr==='A2'?'基础阶段，加强日常场景表达':
+            level.cefr==='B1'?'可以日常交流，重点扩充词汇和语法':
+            level.cefr==='B2'?'具备独立使用能力，向流利表达进发':
+            level.cefr==='C1'?'高阶水平，注重地道表达和语感':
+            '接近母语水平，保持并精炼即可'}
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:12px;">
+      <div class="card-title">分项得分</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">
+        ${sectionResults.map(s=>`<div class="stat-card">
+          <div style="font-size:18px;margin-bottom:4px;">${s.icon}</div>
+          <div class="stat-val" style="font-size:18px;">${s.got}/${s.total}</div>
+          <div class="stat-lbl">${s.name}</div>
+          <div class="prog-wrap" style="margin-top:6px;"><div class="prog-fill" style="width:${s.pct}%;background:${s.pct>=80?'var(--success)':s.pct>=60?'var(--accent)':'var(--warn)'}"></div></div>
+        </div>`).join('')}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div style="background:var(--success-bg);border-radius:var(--radius-sm);padding:8px 12px;">
+          <div style="font-size:11px;font-weight:600;color:var(--success);margin-bottom:2px;">💪 最强项</div>
+          <div style="font-size:13px;color:var(--text);">${strongest.icon} ${strongest.name} · ${strongest.pct}%</div>
+        </div>
+        <div style="background:var(--warn-bg);border-radius:var(--radius-sm);padding:8px 12px;">
+          <div style="font-size:11px;font-weight:600;color:var(--warn);margin-bottom:2px;">📍 需加强</div>
+          <div style="font-size:13px;color:var(--text);">${weakest.icon} ${weakest.name} · ${weakest.pct}%</div>
+        </div>
+      </div>
+    </div>
+
+    ${state.testHistory.length > 1 ? `
+    <div class="card" style="margin-bottom:12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div class="card-title" style="margin-bottom:0;">历史趋势</div>
+        <button class="btn btn-ghost btn-sm" onclick="showHistory()">全部 →</button>
+      </div>
+      <div style="display:flex;align-items:flex-end;gap:4px;height:90px;padding-bottom:4px;">${chartBars}</div>
+    </div>` : ''}
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <button class="btn btn-ghost" onclick="resetTest()">再测一次</button>
+      <button class="btn btn-primary" onclick="switchPlanTab('plan',document.getElementById('ptab-plan'));renderPlanSetupBanner();">制定计划 →</button>
+    </div>
+  `;
+}
+
+function showHistory() {
+  document.getElementById('test-home-view').style.display='none';
+  document.getElementById('test-q-view').style.display='none';
+  document.getElementById('test-res-view').style.display='block';
+  const el = document.getElementById('test-res-view');
+  if(!state.testHistory.length) {
+    el.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;"><div style="font-size:16px;font-weight:600;color:var(--text);">历史记录</div><button class="btn btn-ghost btn-sm" onclick="resetTest()">← 返回</button></div><div class="card"><div style="font-size:14px;color:var(--text3);padding:1rem 0;text-align:center;">还没有测试记录</div></div>`;
+    return;
+  }
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+      <div style="font-size:16px;font-weight:600;color:var(--text);">历史记录</div>
+      <button class="btn btn-ghost btn-sm" onclick="resetTest()">← 返回</button>
+    </div>
+    <div class="card">
+      ${state.testHistory.map((r,i)=>{
+        const lv=getScoreLevel(r.pct); const prev2=state.testHistory[i+1];
+        const delta=prev2?r.pct-prev2.pct:null;
+        return `<div class="day-row" style="align-items:center;">
+          <div style="flex:1;">
+            <div style="font-size:14px;font-weight:500;color:var(--text);">${r.pct}% · ${lv.label}</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:2px;">${new Date(r.date).toLocaleDateString('zh',{month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;margin-right:8px;">
+            <div style="font-size:13px;font-weight:600;color:var(--accent);">雅思 ${lv.ielts}</div>
+            ${delta!==null?`<div style="font-size:11px;color:${delta>=0?'var(--success)':'var(--danger)'};">${delta>=0?'▲':'▼'}${Math.abs(delta)}%</div>`:'<div style="font-size:11px;color:var(--text3);">首次</div>'}
+          </div>
+          <button style="background:none;border:none;cursor:pointer;font-size:16px;color:var(--text3);padding:4px;" onclick="deleteRecord(${i})">✕</button>
+        </div>`;
+      }).join('')}
+    </div>
+    <button class="btn btn-ghost btn-block" style="margin-top:4px;" onclick="if(confirm('确认清除所有记录？')){state.testHistory=[];localStorage.removeItem(lk('history'));showHistory();}">清除所有记录</button>
+  `;
+}
+
+function deleteRecord(i) {
+  state.testHistory.splice(i,1);
+  try { localStorage.setItem(lk('history'), JSON.stringify(state.testHistory)); } catch(e){}
+  showHistory();
+}
+
+function resetTest() {
+  document.getElementById('test-home-view').style.display='block';
+  document.getElementById('test-q-view').style.display='none';
+  document.getElementById('test-res-view').style.display='none';
+  initTestPage();
+}
+
+// PLAN
+function selLevel(val, el) {
+  state.planLevel=val;
+  document.querySelectorAll('#level-grid .level-card').forEach(x=>x.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+async function genPlan() {
+  document.getElementById('plan-setup-view').style.display='none';
+  const rv = document.getElementById('plan-result-view');
+  rv.style.display='block';
+  rv.innerHTML = loading('AI 正在为你量身定制…');
+  const time = document.getElementById('plan-time').value;
+  const goal = document.getElementById('plan-goal').value.trim() || '提升日常沟通能力';
+
+  // === Score analysis ===
+  let scoreCtx = '';
+  let scoreInsight = '';
+  if(state.testHistory.length) {
+    const latest = state.testHistory[0];
+    const lv = getScoreLevel(latest.pct);
+    const sc = state.testSectionScores || {};
+    const sectionScores = Object.entries(sc).map(([k,v])=>`${k}:${v}/5`).join(', ');
+    scoreCtx = `Learner's test: ${latest.pct}% overall (IELTS ~${lv.ielts}, CEFR ${lv.cefr}, ${lv.label}).`;
+    if(sectionScores) scoreCtx += ` Section breakdown: ${sectionScores}.`;
+    if(state.testHistory.length >= 2) {
+      const delta = latest.pct - state.testHistory[1].pct;
+      scoreCtx += ` Trend vs last test: ${delta>=0?'+':''}${delta}%.`;
+    }
+    // Weak areas from error memory
+    const errCounts = {};
+    state.errorMemory.forEach(e=>{ errCounts[e.type]=(errCounts[e.type]||0)+1; });
+    const topErr = Object.entries(errCounts).sort((a,b)=>b[1]-a[1]).slice(0,2).map(([t])=>t).join(', ');
+    if(topErr) scoreCtx += ` Consistent weak areas from practice: ${topErr}.`;
+  } else {
+    scoreCtx = `No test taken yet. Assume ${state.planLevel} level.`;
+  }
+
+  // === Goal gap analysis ===
+  // Try to detect if goal mentions a specific target (IELTS score, usage scenario, etc.)
+  const goalCtx = `User's stated goal: "${goal}". Analyse the gap between current level and this goal. If the goal mentions a specific score (e.g. IELTS 6.5), calculate roughly how many bands/points away they are and what skills matter most. If the goal is situational (e.g. job interview, travel), identify the key vocabulary and conversation patterns needed.`;
+
+  apiCall(
+    `Create a personalised 30-day ${state.lang} learning plan.
+${scoreCtx}
+${goalCtx}
+Daily study time: ${time} min.
+
+Return ONLY JSON:
+{
+  "goalBreakdown": "2句话：①当前水平与目标的差距分析 ②为什么这个计划能帮你达到目标（中文）",
+  "matchNote": "一句话说明计划如何同时匹配成绩弱点和用户目标（中文）",
+  "milestones": ["第1周可以做到…","第2周…","第3周…","第4周达成…"],
+  "weeks": [{"week":1,"theme":"周主题（中文）","days":[{"day":1,"topic":"话题（中文，简短）","task":"任务类型（中文，8字内）"}]}]
+}
+
+Rules:
+- 4 weeks, ~7-8 days each (day 1-30)
+- Weight topics toward the user's goal scenario (e.g. if goal is job interview, include interview vocab, professional small talk)
+- Weight difficulty toward fixing the user's weak areas from test scores
+- Use real-life Canada topics where possible
+- Progress difficulty week by week`,
+    'Generate.',
+    2000,
+    data => {
+      state.planData = data;
+      try { localStorage.setItem(lk('plan'), JSON.stringify(data)); } catch(e){}
+      renderPlan();
+    },
+    () => { rv.innerHTML = errCard(); }
+  );
+}
+
+function renderPlan() {
+  if(!state.planData) return;
+  const rv = document.getElementById('plan-result-view');
+  rv.style.display = 'block';
+  const total = Object.keys(state.planDone).length;
+  const pct = Math.round(total/30*100);
+
+  // Check if plan is behind (done days vs expected days based on start date)
+  const startDate = state.planStartDate ? new Date(state.planStartDate) : null;
+  const daysSinceStart = startDate ? Math.floor((Date.now()-startDate)/86400000)+1 : 0;
+  const isBehind = daysSinceStart > 3 && total < daysSinceStart - 2;
+
+  let goalSection = '';
+  if(state.planData.goalBreakdown) {
+    goalSection = `<div class="card" style="margin-bottom:12px;">
+      <div style="font-size:12px;font-weight:600;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.3px;">目标</div>
+      <div style="font-size:14px;color:var(--text);line-height:1.6;">${state.planData.goalBreakdown}</div>
+      ${state.planData.matchNote ? `
+      <div style="margin-top:8px;font-size:12px;color:var(--accent-text);background:var(--accent-bg);
+        border-radius:var(--radius-sm);padding:7px 10px;">
+        🎯 ${state.planData.matchNote}
+      </div>` : ''}
+      ${state.planData.milestones ? `<div style="margin-top:10px;display:grid;grid-template-columns:repeat(2,1fr);gap:6px;">
+        ${state.planData.milestones.map((m,i)=>`<div style="background:var(--bg2);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--text2);"><span style="font-weight:600;color:var(--accent);">第${i+1}周 </span>${m}</div>`).join('')}
+      </div>` : ''}
+    </div>`;
+  }
+
+  let scoreBanner = '';
+  if(state.testHistory.length) {
+    const lv = getScoreLevel(state.testHistory[0].pct);
+    scoreBanner = `<div style="background:var(--accent-bg);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;">
+      <div style="flex:1;font-size:12px;color:var(--accent-text);">基于测试成绩 · 雅思约 ${lv.ielts} · ${lv.label}${state.planData.scoreNote?' · '+state.planData.scoreNote:''}</div>
+      <button class="btn btn-ghost btn-sm" onclick="goPage('plan',1);setTimeout(()=>switchPlanTab('test',document.getElementById('ptab-test')),50)">重测</button>
+    </div>`;
+  }
+
+  rv.innerHTML = `
+    ${goalSection}
+    ${scoreBanner}
+    ${isBehind ? `<div style="background:var(--warn-bg);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;">
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:600;color:var(--warn);">计划有点落后</div>
+        <div style="font-size:12px;color:var(--warn);opacity:.8;margin-top:2px;">已过 ${daysSinceStart} 天，完成 ${total} 天</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="adjustPlan()" style="border-color:var(--warn);color:var(--warn);">调整计划</button>
+    </div>` : ''}
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-val">${total}</div><div class="stat-lbl">已完成</div></div>
+      <div class="stat-card"><div class="stat-val">30</div><div class="stat-lbl">总天数</div></div>
+      <div class="stat-card"><div class="stat-val">${pct}%</div><div class="stat-lbl">完成率</div></div>
+    </div>
+    <div class="prog-wrap" style="margin-bottom:${pct>=100?'0':'16px'};"><div class="prog-fill" style="width:${pct}%"></div></div>
+    ${pct >= 100 ? `<div style="background:var(--success-bg);border-radius:var(--radius-sm);padding:14px 16px;margin:12px 0;display:flex;align-items:center;gap:12px;">
+      <div style="font-size:24px;">🎉</div>
+      <div style="flex:1;"><div style="font-size:14px;font-weight:600;color:var(--success);">30天计划完成！</div>
+      <div style="font-size:12px;color:var(--success);opacity:.8;margin-top:2px;">重新测试看看你的进步</div></div>
+      <button class="btn btn-primary btn-sm" onclick="goPage('plan',1);setTimeout(()=>switchPlanTab('test',document.getElementById('ptab-test')),50)" style="background:var(--success);flex-shrink:0;">去测试</button>
+    </div>` : ''}
+    ${state.planData.weeks.map(w=>`
+      <div class="card">
+        <div class="week-header">
+          <span class="badge badge-blue">第 ${w.week} 周</span>
+          <span style="font-size:14px;font-weight:600;color:var(--text);">${w.theme}</span>
+          <button class="btn btn-ghost btn-sm" style="margin-left:auto;" onclick="editWeek(${w.week-1})">编辑</button>
+        </div>
+        ${w.days.map(d=>`<div class="day-row" id="day-row-${d.day}">
+          <div style="min-width:36px;font-size:11px;font-weight:600;color:${state.planDone[d.day]?'var(--success)':'var(--text3)'};">Day ${d.day}</div>
+          <div class="day-info" id="day-info-${d.day}">
+            <div class="day-topic ${state.planDone[d.day]?'done-text':''}">${d.topic}</div>
+            <div class="day-task">${d.task}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+            ${state.planDone[d.day]
+              ? `<span style="font-size:14px;color:var(--success);">✓</span>`
+              : `<button class="prac-btn" onclick="goPage('daily',2);loadDayPractice(${d.day})">今日练习</button>`}
+          </div>
+        </div>`).join('')}
+      </div>`).join('')}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
+      <button class="btn btn-ghost btn-block" onclick="adjustPlan()">调整难度</button>
+      <button class="btn btn-ghost btn-block" onclick="resetPlan()">重新生成</button>
+    </div>`;
+}
+
+function editWeek(weekIdx) {
+  const week = state.planData.weeks[weekIdx];
+  const modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;display:flex;align-items:flex-end;';
+  modal.innerHTML = `<div style="width:100%;background:var(--surface);border-radius:20px 20px 0 0;padding:20px 20px calc(var(--safe-b)+20px);max-height:80vh;overflow-y:auto;">
+    <div style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:16px;">编辑第 ${week.week} 周</div>
+    ${week.days.map((d,i)=>`<div style="margin-bottom:12px;">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Day ${d.day}</div>
+      <input type="text" id="edit-topic-${d.day}" value="${d.topic}" placeholder="话题" style="margin-bottom:4px;"/>
+      <input type="text" id="edit-task-${d.day}" value="${d.task}" placeholder="任务类型"/>
+    </div>`).join('')}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px;">
+      <button class="btn btn-ghost" onclick="this.closest('div[style*=fixed]').remove()">取消</button>
+      <button class="btn btn-primary" onclick="saveWeekEdit(${weekIdx},this)">保存</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+}
+
+function saveWeekEdit(weekIdx, btn) {
+  const week = state.planData.weeks[weekIdx];
+  week.days.forEach(d => {
+    const t = document.getElementById('edit-topic-'+d.day);
+    const k = document.getElementById('edit-task-'+d.day);
+    if(t) d.topic = t.value.trim() || d.topic;
+    if(k) d.task = k.value.trim() || d.task;
+  });
+  try { localStorage.setItem(lk('plan'), JSON.stringify(state.planData)); } catch(e){}
+  btn.closest('div[style*="position:fixed"]').remove();
+  renderPlan();
+}
+
+async function adjustPlan() {
+  if(!state.planData) return;
+  const rv = document.getElementById('plan-result-view');
+  const total = Object.keys(state.planDone).length;
+  const remaining = 30 - total;
+  rv.innerHTML = loading('AI 正在调整剩余计划…');
+  const lv = state.testHistory.length ? getScoreLevel(state.testHistory[0].pct) : null;
+  apiCall(
+    `Adjust the remaining ${remaining} days of a ${state.lang} learning plan.
+Current progress: ${total}/30 days done. Level: ${state.planLevel}.${lv ? ` Latest test: ${state.testHistory[0].pct}% (IELTS ${lv.ielts}).` : ''}
+Return ONLY JSON with the same structure but only for the remaining days, renumbered from day ${total+1} to 30:
+{"goalBreakdown":"${state.planData.goalBreakdown||''}","milestones":${JSON.stringify(state.planData.milestones||[])},"scoreNote":"已根据进度调整难度","weeks":[{"week":N,"theme":"周主题","days":[{"day":N,"topic":"话题","task":"任务"}]}]}
+Increase difficulty slightly. Keep real-life Canada topics.`,
+    'Adjust now.',
+    2000,
+    data => {
+      // Merge: keep done days structure, replace remaining
+      const doneDays = state.planData.weeks.flatMap(w=>w.days).filter(d=>state.planDone[d.day]);
+      state.planData = data;
+      state.planData.weeks.forEach(w => w.days.forEach(d => {
+        const orig = doneDays.find(x=>x.day===d.day);
+        if(orig) { d.topic=orig.topic; d.task=orig.task; }
+      }));
+      try { localStorage.setItem(lk('plan'), JSON.stringify(state.planData)); } catch(e){}
+      renderPlan();
+    },
+    () => { rv.innerHTML = errCard(); renderPlan(); }
+  );
+}
+
+function toggleDay(day) {
+  if(state.planDone[day]) {
+    delete state.planDone[day];
+  } else {
+    state.planDone[day] = new Date().toISOString().slice(0,10);
+    if(!state.planStartDate) {
+      state.planStartDate = new Date().toISOString();
+      try { localStorage.setItem(lk('startdate'), state.planStartDate); } catch(e){}
+    }
+  }
+  try { localStorage.setItem(lk('done'), JSON.stringify(state.planDone)); } catch(e){}
+  // Keep showing the same day — just re-render to update states
+  renderDaily();
+}
+
+function resetPlan() {
+  state.planData=null; state.planDone={};
+  try { localStorage.removeItem(lk('plan')); localStorage.removeItem(lk('done')); } catch(e){}
+  document.getElementById('plan-result-view').style.display='none';
+  document.getElementById('plan-setup-view').style.display='block';
+}
+
+// ERROR MEMORY
+function saveError(type, userInput, correction, nativeExpr) {
+  const record = { date:new Date().toISOString(), type, userInput, correction, nativeExpr, topic:state.dailyTopic||'' };
+  state.errorMemory.unshift(record);
+  if(state.errorMemory.length > 50) state.errorMemory = state.errorMemory.slice(0,50);
+  try { localStorage.setItem(lk('errors'), JSON.stringify(state.errorMemory)); } catch(e){}
+}
+
+function getWeakPoints() {
+  if(!state.errorMemory.length) return '';
+  const counts = {};
+  state.errorMemory.forEach(e => { counts[e.type]=(counts[e.type]||0)+1; });
+  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  const top = sorted.slice(0,2).map(([t,n])=>`${t}(${n}次)`).join('、');
+  return top ? `用户常犯错误类型：${top}。` : '';
+}
+
+function showXPToast(xp, msg) {
+  const text = msg || `+${xp} XP`;
+  const t = document.createElement('div');
+  t.textContent = text;
+  t.style.cssText = `position:fixed;top:calc(var(--safe-t) + 70px);left:50%;
+    transform:translateX(-50%);background:var(--accent);color:#fff;
+    padding:8px 20px;border-radius:20px;font-size:14px;font-weight:600;
+    z-index:999;opacity:1;transition:opacity .4s;pointer-events:none;
+    white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,0.15);`;
+  document.body.appendChild(t);
+  setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.remove(), 400); }, 1800);
+}
+
+function showLoadingModal(msg) {
+  const existing = document.getElementById('loading-modal');
+  if(existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'loading-modal';
+  el.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,0.45);
+    z-index:400;display:flex;align-items:center;justify-content:center;`;
+  el.innerHTML = `<div style="background:var(--surface);border-radius:var(--radius);
+    padding:28px 32px;text-align:center;min-width:200px;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+    <div style="font-size:32px;margin-bottom:12px;">✨</div>
+    <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px);">${msg}</div>
+    <div style="font-size:13px;color:var(--text3);margin-top:8px;">
+      稍等一下<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span>
+    </div>
+  </div>`;
+  document.body.appendChild(el);
+}
+
+function hideLoadingModal() {
+  document.getElementById('loading-modal')?.remove();
+}
+
+function showRepeatModal(day, topic) {
+  const existing = document.getElementById('repeat-modal');
+  if(existing) existing.remove();
+  const modal = document.createElement('div');
+  modal.id = 'repeat-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;';
+  modal.innerHTML = `
+    <div style="background:var(--surface);border-radius:var(--radius);padding:24px;max-width:300px;width:100%;text-align:center;">
+      <div style="font-size:24px;margin-bottom:10px;">🔄</div>
+      <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px;">再练一次？</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.5;">
+        这天已打卡完成，再练不会重复计算
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <button class="btn btn-ghost" onclick="document.getElementById('repeat-modal').remove()">取消</button>
+        <button class="btn btn-primary" onclick="document.getElementById('repeat-modal').remove();genDailyTopic('${topic.replace(/'/g,"\\'")}')">开始练习</button>
+      </div>
+    </div>`;
+  modal.addEventListener('click', e=>{ if(e.target===modal) modal.remove(); });
+  document.body.appendChild(modal);
+}
+
+function renderDaily() {
+  const el = document.getElementById('daily-out');
+  if(!el) return;
+  const total = Object.keys(state.planDone).length;
+  const pct = Math.round(total/30*100);
+
+  if(!state.viewDay && state.planData) {
+    const allDays = state.planData.weeks.flatMap(w=>w.days);
+    const next = allDays.find(d=>!state.planDone[d.day]);
+    state.viewDay = next ? next.day : allDays[allDays.length-1]?.day;
+  }
+  const todayDay = state.dailyDay || state.viewDay;
+  let todayData = null;
+  if(todayDay && state.planData) {
+    todayData = state.planData.weeks.flatMap(w=>w.days).find(d=>d.day===todayDay);
+  }
+  const isDone = !!(todayDay && state.planDone[todayDay]);
+
+  let otherHtml = '';
+  if(state.planData) {
+    const allDays = state.planData.weeks.flatMap(w=>w.days);
+    otherHtml = allDays.filter(d=>d && d.day && d.day!==todayDay).slice(0,20).map(d=>{
+      const done = !!state.planDone[d.day];
+      const topic = d.topic || '';
+      const task = d.task || '';
+      const topicSafe = topic.replace(/'/g,"\\'").replace(/"/g,'&quot;');
+      return `<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);">
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:500;color:${done?'var(--text3)':'var(--text)'};
+            ${done?'text-decoration:line-through;':''}white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            Day ${d.day} · ${topic}
+          </div>
+          <div style="font-size:11px;color:var(--text3);margin-top:1px;">${task}</div>
+        </div>
+        <button onclick="${done?`showRepeatModal(${d.day},'${topicSafe}')`:`startDailyPracticeFromPlan(${d.day},'${topicSafe}')`}"
+          title="${done?'已完成，点击再练':'点击开始练习'}"
+          style="flex-shrink:0;width:34px;height:34px;border-radius:50%;cursor:pointer;
+          border:1.5px solid ${done?'var(--success)':'var(--border2)'};
+          background:${done?'var(--success-bg)':'transparent'};
+          color:${done?'var(--success)':'var(--text3)'};font-size:15px;font-family:inherit;
+          display:flex;align-items:center;justify-content:center;transition:all .15s;">
+          ${done?'&#10003;':'&#9675;'}
+        </button>
+      </div>`;
+    }).join('');
+  }
+
+  el.innerHTML = `
+    ${state.planData ? `
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+        <span style="font-size:12px;color:var(--text3);font-weight:500;">学习进度</span>
+        <span id="prog-label" style="font-size:12px;color:var(--text3);">${total} / 30 天 · ${pct}%</span>
+      </div>
+      <div style="background:var(--bg3);border-radius:4px;height:5px;">
+        <div id="daily-prog-bar" style="height:5px;border-radius:4px;background:var(--accent);width:${pct}%;transition:width .4s;"></div>
+      </div>
+    </div>
+
+    ${todayData ? `
+    <div class="card" style="margin-bottom:12px;">
+      <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;">
+        <div style="flex:1;">
+          <div style="font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.4px;text-transform:uppercase;margin-bottom:5px;">
+            Day ${todayDay} · 今日任务
+          </div>
+          <div style="font-size:17px;font-weight:600;line-height:1.3;margin-bottom:4px;
+            color:${isDone?'var(--text3)':'var(--text)'};${isDone?'text-decoration:line-through;':''}">
+            ${todayData.topic||''}
+          </div>
+          <div style="font-size:13px;color:var(--text2);">${todayData.task||''}</div>
+        </div>
+        <div style="flex-shrink:0;width:44px;height:44px;border-radius:50%;
+          border:2px solid ${isDone?'var(--success)':'var(--border2)'};
+          background:${isDone?'var(--success-bg)':'var(--bg2)'};
+          display:flex;align-items:center;justify-content:center;margin-top:2px;">
+          <span style="font-size:18px;color:${isDone?'var(--success)':'var(--text3)'};">${isDone?'✓':'○'}</span>
+        </div>
+      </div>
+      ${!isDone
+        ? `<button class="btn btn-primary btn-block" style="font-size:14px;"
+            onclick="startDailyPractice(${todayDay},'${(todayData.topic||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">
+            开始今日练习 →
+           </button>`
+        : `<button class="btn btn-ghost btn-block" style="font-size:13px;"
+            onclick="genDailyTopic('${(todayData.topic||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">
+            再练一遍
+           </button>`}
+    </div>
+    ` : `<div class="card" style="margin-bottom:12px;text-align:center;padding:20px;font-size:14px;color:var(--text3);">&#x1F389; 30天全部完成！</div>`}
+
+    ${otherHtml ? `
+    <div class="card" style="margin-bottom:12px;">
+      <div onclick="this.nextElementSibling.classList.toggle('open-list')"
+        style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+        <span style="font-size:13px;font-weight:600;color:var(--text);">查看计划</span>
+        <span style="font-size:12px;color:var(--text3);">展开 ▼</span>
+      </div>
+      <div class="open-list" style="display:none;">
+        <div style="height:1px;background:var(--border);margin:10px 0 0;"></div>
+        ${otherHtml}
+      </div>
+    </div>` : ''}
+
+    ` : `
+    <div class="card" style="margin-bottom:12px;text-align:center;padding:24px 20px;">
+      <div style="font-size:14px;color:var(--text2);margin-bottom:12px;">还没有学习计划</div>
+      <button class="btn btn-primary btn-sm" onclick="goPage('plan',1)">去制定计划 &#x2192;</button>
+    </div>`}
+
+    <div id="daily-practice-out"></div>`;
+
+  document.querySelectorAll('#daily-out .open-list').forEach(list => {
+    const header = list.previousElementSibling;
+    if(header) {
+      header.onclick = () => {
+        const open = list.style.display !== 'none';
+        list.style.display = open ? 'none' : 'block';
+        header.querySelector('span:last-child').textContent = open ? '展开 ▼' : '收起 ▲';
+      };
+    }
+  });
+}
+
+function quickCheckin(day, btn) {
+  if(state.planDone[day]) {
+    delete state.planDone[day];
+    btn.innerHTML='&#9675;'; btn.style.border='1.5px solid var(--border2)';
+    btn.style.background='transparent'; btn.style.color='var(--text3)';
+  } else {
+    state.planDone[day]=true;
+    btn.innerHTML='&#10003;'; btn.style.border='1.5px solid var(--success)';
+    btn.style.background='var(--success-bg)'; btn.style.color='var(--success)';
+    if(!state.planStartDate){state.planStartDate=new Date().toISOString();try{localStorage.setItem(lk('startdate'),state.planStartDate);}catch(e){}}
+  }
+  try{localStorage.setItem(lk('done'),JSON.stringify(state.planDone));}catch(e){}
+  const total=Object.keys(state.planDone).length;
+  const pct=Math.round(total/30*100);
+  const bar=document.getElementById('daily-prog-bar'); if(bar)bar.style.width=pct+'%';
+  const label=document.getElementById('prog-label'); if(label)label.textContent=`${total} / 30 天 · ${pct}%`;
+}
+
+function toggleDay(day) {
+  if(state.planDone[day]) delete state.planDone[day];
+  else {
+    state.planDone[day]=true;
+    if(!state.planStartDate){state.planStartDate=new Date().toISOString();try{localStorage.setItem(lk('startdate'),state.planStartDate);}catch(e){}}
+  }
+  try{localStorage.setItem(lk('done'),JSON.stringify(state.planDone));}catch(e){}
+  renderDaily();
+}
+
+function startDailyPracticeFromPlan(day, topic) {
+  state.pendingCheckinDay = day;
+  launchDailySession(topic);
+}
+
+async function startDailyPractice(day, topic) {
+  state.pendingCheckinDay = day;
+  launchDailySession(topic);
+}
+
+// ============================================================
+// 20-MINUTE STRUCTURED DAILY SESSION
+// Modules: vocab → listening → reading → conversation → speaking/writing
+// Each module ~4 min, errors from memory are prioritized
+// ============================================================
+
+function launchDailySession(topic) {
+  const el = document.getElementById('daily-practice-out');
+  if(!el) return;
+  state.dailyTopic = topic;
+  state.session = {
+    topic,
+    modules: ['vocab','listening','reading','conversation','speaking'],
+    currentModule: 0,
+    results: {},       // { vocab: {correct,total,errors:[]}, ... }
+    startTime: Date.now(),
+  };
+  renderSessionIntro();
+}
+
+function renderSessionIntro() {
+  const el = document.getElementById('daily-practice-out');
+  const topic = state.session.topic;
+  el.innerHTML = `
+    <div class="card" style="text-align:center;padding:24px 16px;margin-bottom:12px;">
+      <div style="font-size:36px;margin-bottom:10px;">📚</div>
+      <div style="font-size:17px;font-weight:600;color:var(--text);margin-bottom:6px;">今日练习：${topic}</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.6;">
+        约 20 分钟 · 5个模块<br>
+        <span style="color:var(--accent);">单词 → 听力 → 阅读 → 对话 → 口语</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:20px;">
+        ${['📝单词','🔊听力','📖阅读','💬对话','🗣️口语'].map(m=>`
+          <div style="background:var(--bg2);border-radius:8px;padding:8px 4px;font-size:11px;color:var(--text2);">${m}</div>
+        `).join('')}
+      </div>
+      <button class="btn btn-primary" style="padding:13px 40px;font-size:15px;" onclick="startNextModule()">
+        开始 →
+      </button>
+    </div>`;
+}
+
+function startNextModule() {
+  const s = state.session;
+  if(s.currentModule >= s.modules.length) { finishSession(); return; }
+  const mod = s.modules[s.currentModule];
+  showLoadingModal(moduleLoadMsg(mod));
+  generateModule(mod);
+}
+
+function moduleLoadMsg(mod) {
+  return {vocab:'正在准备单词练习…',listening:'正在生成听力题…',reading:'正在生成阅读材料…',conversation:'正在生成对话场景…',speaking:'正在生成口语题…'}[mod]||'加载中…';
+}
+
+function generateModule(mod) {
+  const topic = state.session.topic;
+  const lang = state.lang;
+
+  // Pull weak items from error memory for this module type
+  const weakVocab = state.errorMemory.filter(e=>e.type==='vocabulary').slice(0,3).map(e=>e.userInput).join(', ');
+  const weakGrammar = state.errorMemory.filter(e=>e.type==='grammar').slice(0,3).map(e=>e.userInput).join(', ');
+
+  const prompts = {
+    vocab: `Generate a vocabulary exercise for ${lang} learners. Topic: "${topic}".
+${weakVocab ? `Prioritise reviewing these previously incorrect words: ${weakVocab}.` : 'Use common words related to the topic.'}
+Return ONLY JSON:
+{"module":"vocab","title":"单词练习","items":[{"word":"${lang} word","pinyin":"pronunciation hint if Japanese/Korean/Chinese, else empty","cn":"中文释义","example":"example sentence in ${lang} (no Chinese)","cn_example":"例句中文翻译","options":["correct Chinese meaning","wrong Chinese meaning 1","wrong Chinese meaning 2","wrong Chinese meaning 3"],"answer":0}]}
+Generate exactly 5 items. answer = index of correct option (0). Shuffle options.`,
+
+    listening: `Generate a listening comprehension exercise for ${lang} learners. Topic: "${topic}".
+Return ONLY JSON:
+{"module":"listening","title":"听力理解","items":[{"audio":"a natural ${lang} sentence to be read aloud","cn":"中文翻译","options":["correct meaning in Chinese","wrong1","wrong2","wrong3"],"answer":0,"explain":"解析（中文）"}]}
+Generate exactly 4 items. answer=0 always = correct. Shuffle the options array and set answer to the correct index.`,
+
+    reading: `Generate a short reading passage with comprehension questions for ${lang} learners. Topic: "${topic}".
+Return ONLY JSON:
+{"module":"reading","title":"阅读理解","passage":"A 80-100 word ${lang} passage about ${topic}","passage_cn":"中文大意（2句话）","questions":[{"q":"comprehension question in ${lang}","options":["A","B","C","D"],"answer":0,"explain":"解析（中文）"}]}
+Generate exactly 3 questions. Vary question types (main idea, detail, inference).`,
+
+    conversation: `Create an interactive ${lang} conversation practice. Topic: "${topic}".
+${weakGrammar ? `User struggles with: ${weakGrammar}. Design prompts that help practice these.` : ''}
+Return ONLY JSON:
+{"module":"conversation","topic":"话题（中文）","scenario":"场景（中文，一句）","turns":[{"role":"them","en":"their line","cn":"中文"}]}
+Generate 4-5 them-turns only. Keep sentences natural and short.`,
+
+    speaking: `Generate an oral/writing practice prompt for ${lang} learners. Topic: "${topic}".
+Return ONLY JSON:
+{"module":"speaking","title":"口语 & 写作","prompt_en":"A speaking/writing prompt in ${lang} (1-2 sentences describing a situation to respond to)","prompt_cn":"中文说明","hints":["hint phrase 1 in ${lang}","hint phrase 2","hint phrase 3"],"sample_answer":"A natural 2-3 sentence ${lang} response to the prompt","sample_cn":"参考答案中文翻译"}`
+  };
+
+  apiCall(prompts[mod], 'Generate now.', mod==='reading'?1200:900,
+    data => { hideLoadingModal(); renderModule(mod, data); },
+    () => { hideLoadingModal(); skipModule(mod); }
+  );
+}
+
+function renderModule(mod, data) {
+  const el = document.getElementById('daily-practice-out');
+  if(!el) return;
+  state.session.results[mod] = { correct:0, total:0, errors:[], data };
+  window.scrollTo(0,0);
+
+  const moduleIdx = state.session.currentModule + 1;
+  const totalMods = state.session.modules.length;
+  const progressHtml = `
+    <div style="display:flex;gap:4px;margin-bottom:14px;">
+      ${state.session.modules.map((m,i)=>`
+        <div style="flex:1;height:4px;border-radius:2px;background:${i<state.session.currentModule?'var(--success)':i===state.session.currentModule?'var(--accent)':'var(--bg3)'};"></div>
+      `).join('')}
+    </div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">模块 ${moduleIdx}/${totalMods} · ${data.title||moduleLabel(mod)}</div>`;
+
+  if(mod==='vocab') renderVocabModule(el, data, progressHtml);
+  else if(mod==='listening') renderListeningModule(el, data, progressHtml);
+  else if(mod==='reading') renderReadingModule(el, data, progressHtml);
+  else if(mod==='conversation') renderConvModule(el, data, progressHtml);
+  else if(mod==='speaking') renderSpeakingModule(el, data, progressHtml);
+}
+
+function moduleLabel(mod) {
+  return {vocab:'单词',listening:'听力',reading:'阅读',conversation:'对话',speaking:'口语'}[mod]||mod;
+}
+
+// --- VOCAB MODULE ---
+function renderVocabModule(el, data, progress) {
+  state.vocabIdx = 0;
+  state.vocabData = data.items || [];
+  renderVocabItem(el, progress);
+}
+
+function renderVocabItem(el, progress) {
+  if(!el) el = document.getElementById('daily-practice-out');
+  const items = state.vocabData;
+  const idx = state.vocabIdx;
+  if(idx >= items.length) { completeModule('vocab'); return; }
+  const item = items[idx];
+  el.innerHTML = `${progress||''}
+    <div class="card" style="margin-bottom:12px;">
+      <div style="text-align:center;padding:12px 0;">
+        <div style="font-size:34px;font-weight:700;color:var(--text);margin-bottom:6px;">${item.word}</div>
+        ${item.pinyin?`<div style="font-size:14px;color:var(--text3);margin-bottom:8px;">${item.pinyin}</div>`:''}
+        <div style="font-size:14px;color:var(--text2);font-style:italic;margin-bottom:10px;">${item.example}</div>
+        <button onclick="this.nextElementSibling.style.display='block';this.style.display='none'"
+          style="font-size:12px;color:var(--text3);background:none;border:1px dashed var(--border2);
+          border-radius:8px;padding:4px 12px;cursor:pointer;font-family:inherit;">显示例句译文</button>
+        <div style="display:none;font-size:12px;color:var(--text3);margin-top:6px;">${item.cn_example}</div>
+      </div>
+    </div>
+    <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px;">这个词的意思是？</div>
+    ${item.options.map((o,i)=>`
+      <button class="opt" id="vopt-${i}" onclick="answerVocab(${i},${item.answer},'${item.word.replace(/'/g,"\\'")}','${item.cn.replace(/'/g,"\\'")}')">
+        <span style="font-weight:600;margin-right:8px;color:var(--accent)">${'ABCD'[i]}</span>${o}
+      </button>`).join('')}
+    <div id="vocab-explain" style="display:none;"></div>
+    <button id="vocab-next" style="display:none;" class="btn btn-primary btn-block" onclick="nextVocab()">
+      ${idx < items.length-1 ? '下一个单词 →' : '完成单词练习 →'}
+    </button>`;
+}
+
+function answerVocab(i, correct, word, cn) {
+  for(let x=0;x<4;x++) {
+    const b=document.getElementById('vopt-'+x);
+    if(b){b.disabled=true; if(x===correct)b.classList.add('correct'); else if(x===i&&i!==correct)b.classList.add('wrong');}
+  }
+  const r = state.session.results['vocab'];
+  r.total++;
+  if(i===correct) { r.correct++; }
+  else {
+    r.errors.push({word, cn, type:'vocabulary'});
+    saveError('vocabulary', word, cn, '');
+  }
+  const ex = document.getElementById('vocab-explain');
+  if(ex) { ex.style.display='block'; ex.innerHTML=`<div style="background:var(--bg2);border-radius:var(--radius-sm);padding:10px 12px;margin:8px 0;font-size:13px;color:var(--text2);">${cn}</div>`; }
+  const nb = document.getElementById('vocab-next');
+  if(nb) nb.style.display='block';
+}
+
+function nextVocab() {
+  state.vocabIdx++;
+  const el = document.getElementById('daily-practice-out');
+  const progress = buildProgressHtml();
+  renderVocabItem(el, progress);
+}
+
+// --- LISTENING MODULE ---
+function renderListeningModule(el, data, progress) {
+  state.listenIdx = 0;
+  state.listenData = data.items || [];
+  renderListenItem(el, progress);
+}
+
+function renderListenItem(el, progress) {
+  if(!el) el = document.getElementById('daily-practice-out');
+  const items = state.listenData;
+  const idx = state.listenIdx;
+  if(idx >= items.length) { completeModule('listening'); return; }
+  const item = items[idx];
+  el.innerHTML = `${progress||''}
+    <div class="card" style="margin-bottom:12px;text-align:center;padding:20px;">
+      <div style="font-size:13px;color:var(--text2);margin-bottom:14px;">听录音，选出正确的中文意思</div>
+      <button onclick="speakText(null,'${item.audio.replace(/'/g,"\\'")}')"
+        style="display:inline-flex;align-items:center;gap:8px;background:var(--accent-bg);
+        color:var(--accent-text);border:none;border-radius:40px;padding:12px 28px;
+        font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:8px;">
+        <span style="font-size:20px;">🔊</span> 播放
+      </button>
+      <div style="margin-top:8px;">
+        <button onclick="toggleListenTextInline(this,'${item.audio.replace(/'/g,"\\'")}')"
+          style="font-size:12px;color:var(--text3);background:none;border:1px dashed var(--border2);
+          border-radius:8px;padding:5px 12px;cursor:pointer;font-family:inherit;">显示原文</button>
+        <div id="listen-inline-text" style="display:none;margin-top:8px;font-size:14px;font-weight:500;color:var(--text);padding:8px 12px;background:var(--bg2);border-radius:var(--radius-sm);">${item.audio}</div>
+      </div>
+    </div>
+    ${item.options.map((o,i)=>`
+      <button class="opt" id="lopt-${i}" onclick="answerListen(${i},${item.answer},'${item.audio.replace(/'/g,"\\'")}')">
+        <span style="font-weight:600;margin-right:8px;color:var(--accent)">${'ABCD'[i]}</span>${o}
+      </button>`).join('')}
+    <div id="listen-explain" style="display:none;"></div>
+    <button id="listen-next" style="display:none;" class="btn btn-primary btn-block" onclick="nextListen()">
+      ${idx < items.length-1 ? '下一题 →' : '完成听力练习 →'}
+    </button>`;
+  // Auto play
+  setTimeout(() => speakText(null, item.audio), 600);
+}
+
+function toggleListenTextInline(btn, text) {
+  const box = document.getElementById('listen-inline-text');
+  if(!box) return;
+  if(box.style.display==='none') { box.style.display='block'; btn.textContent='隐藏原文'; }
+  else { box.style.display='none'; btn.textContent='显示原文'; }
+}
+
+function answerListen(i, correct, audio) {
+  for(let x=0;x<4;x++){const b=document.getElementById('lopt-'+x);if(b){b.disabled=true;if(x===correct)b.classList.add('correct');else if(x===i&&i!==correct)b.classList.add('wrong');}}
+  const r=state.session.results['listening'];
+  r.total++;
+  if(i===correct){r.correct++;}else{r.errors.push({audio,type:'listening'});saveError('expression',audio,'','');}
+  const ex=document.getElementById('listen-explain');
+  const item=state.listenData[state.listenIdx];
+  if(ex){ex.style.display='block';ex.innerHTML=`<div style="background:var(--bg2);border-radius:var(--radius-sm);padding:10px 12px;margin:8px 0;font-size:13px;color:var(--text2);">${item?.explain||''}</div>`;}
+  const nb=document.getElementById('listen-next');if(nb)nb.style.display='block';
+}
+
+function nextListen(){state.listenIdx++;const el=document.getElementById('daily-practice-out');renderListenItem(el,buildProgressHtml());}
+
+// --- READING MODULE ---
+function renderReadingModule(el, data, progress) {
+  state.readIdx = 0;
+  state.readData = data;
+  el.innerHTML = `${progress}
+    <div class="card" style="margin-bottom:12px;">
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px;">阅读短文</div>
+      <div style="font-size:14px;color:var(--text);line-height:1.8;">${data.passage}</div>
+      <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
+        <button onclick="this.nextElementSibling.style.display='block';this.style.display='none'" style="font-size:12px;color:var(--accent);background:none;border:none;cursor:pointer;">显示中文大意</button>
+        <div style="display:none;font-size:13px;color:var(--text3);">${data.passage_cn}</div>
+      </div>
+    </div>
+    <div id="read-questions"></div>`;
+  renderReadQuestion();
+}
+
+function renderReadQuestion() {
+  const el = document.getElementById('read-questions');
+  if(!el) return;
+  const idx = state.readIdx;
+  const qs = state.readData.questions || [];
+  if(idx >= qs.length) { completeModule('reading'); return; }
+  const q = qs[idx];
+  el.innerHTML = `
+    <div class="card" style="margin-bottom:12px;">
+      <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:12px;">Q${idx+1}. ${q.q}</div>
+      ${q.options.map((o,i)=>`
+        <button class="opt" id="ropt-${i}" onclick="answerRead(${i},${q.answer},'${(q.explain||'').replace(/'/g,"\\'")}')">
+          <span style="font-weight:600;margin-right:8px;color:var(--accent)">${'ABCD'[i]}</span>${o}
+        </button>`).join('')}
+      <div id="read-explain" style="display:none;"></div>
+      <button id="read-next" style="display:none;" class="btn btn-primary btn-block" onclick="nextRead()">
+        ${idx < qs.length-1 ? '下一题 →' : '完成阅读练习 →'}
+      </button>
+    </div>`;
+}
+
+function answerRead(i, correct, explain) {
+  for(let x=0;x<4;x++){const b=document.getElementById('ropt-'+x);if(b){b.disabled=true;if(x===correct)b.classList.add('correct');else if(x===i&&i!==correct)b.classList.add('wrong');}}
+  const r=state.session.results['reading'];
+  r.total++;
+  if(i===correct)r.correct++;else r.errors.push({explain,type:'reading'});
+  const ex=document.getElementById('read-explain');
+  if(ex){ex.style.display='block';ex.innerHTML=`<div style="background:var(--bg2);border-radius:var(--radius-sm);padding:10px 12px;margin:8px 0;font-size:13px;color:var(--text2);">${explain}</div>`;}
+  const nb=document.getElementById('read-next');if(nb)nb.style.display='block';
+}
+
+function nextRead(){state.readIdx++;renderReadQuestion();}
+
+// --- CONVERSATION MODULE (reuse existing conv system) ---
+function renderConvModule(el, data, progress) {
+  state.dailyConv = data;
+  state.convHistory = [];
+  state.session.results['conversation'] = { correct:0, total:0, errors:[] };
+  // Store progress html for conv done
+  state.sessionProgressHtml = progress;
+  el.innerHTML = `${progress}
+    <div class="st-hero" style="margin-bottom:12px;">
+      <div class="st-topic">${data.topic||state.session.topic}</div>
+      <div class="st-scene">${data.scenario||''}</div>
+    </div>
+    <div id="conv-card" style="padding-bottom:110px;">
+      <div id="conv-thread"></div>
+      <div id="conv-done-area"></div>
+    </div>
+    <div id="conv-input-bar" style="position:fixed;bottom:calc(var(--tab-h) + var(--safe-b));left:0;right:0;
+      background:var(--surface);border-top:1px solid var(--border);padding:8px 14px;z-index:50;">
+      <div id="conv-skip-row" style="display:none;margin-bottom:6px;">
+        <button class="btn btn-ghost btn-block" style="font-size:12px;padding:7px;" onclick="skipTurn()">跳过，看参考答案</button>
+      </div>
+      <div id="conv-input-area"></div>
+    </div>`;
+  // Override showConvDone for session mode
+  state.convDoneCallback = () => completeConvModule();
+  renderConvThread();
+}
+
+function completeConvModule() {
+  const bar = document.getElementById('conv-input-bar');
+  if(bar) bar.style.display='none';
+  const card = document.getElementById('conv-card');
+  if(card) card.style.paddingBottom='0';
+  // Copy conv results to session
+  const userTurns = state.convHistory.filter(h=>h.role==='user');
+  const r = state.session.results['conversation'];
+  r.total = userTurns.length;
+  r.correct = userTurns.filter(h=>h.feedback&&h.feedback.isCorrect).length;
+  r.errors = userTurns.filter(h=>h.feedback&&!h.feedback.isCorrect).map(h=>({userInput:h.userInput,correction:h.feedback.correction,nativeExpr:h.feedback.nativeExpr}));
+  state.session.currentModule++;
+  showModuleSummary('conversation', r, () => startNextModule());
+}
+
+// --- SPEAKING MODULE ---
+// ============================================================
+// CONVERSATION ENGINE
+// ============================================================
+const BOT_NAME = 'Poly';
+
+function renderConvPractice() {
+  const el = document.getElementById('daily-practice-out');
+  if(!el || !state.dailyConv) return;
+  const conv = state.dailyConv;
+  const voiceOn = !!state.voiceMode;
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <div style="font-size:13px;color:var(--text2);">Poly 的回应</div>
+      <button onclick="toggleVoiceMode(this)"
+        style="display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:20px;
+        border:1.5px solid ${voiceOn?'var(--accent)':'var(--border2)'};
+        background:${voiceOn?'var(--accent-bg)':'transparent'};
+        color:${voiceOn?'var(--accent-text)':'var(--text2)'};
+        font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+          stroke="${voiceOn?'var(--accent)':'var(--text2)'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+          ${voiceOn?'<path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>':'<line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>'}
+        </svg>
+        ${voiceOn?'语音朗读 开':'语音朗读 关'}
+      </button>
+    </div>
+    <div class="st-hero" style="margin-bottom:12px;">
+      <div class="st-topic">${conv.topic||state.dailyTopic||''}</div>
+      <div class="st-scene">${conv.scenario||''}</div>
+    </div>
+    <div id="conv-card" style="padding-bottom:110px;">
+      <div id="conv-thread"></div>
+      <div id="conv-done-area"></div>
+    </div>
+    <div id="conv-input-bar" style="position:fixed;bottom:calc(var(--tab-h) + var(--safe-b));left:0;right:0;
+      background:var(--surface);border-top:1px solid var(--border);padding:8px 14px;z-index:50;">
+      <div id="conv-skip-row" style="display:none;margin-bottom:6px;">
+        <button class="btn btn-ghost btn-block" style="font-size:12px;padding:7px;" onclick="skipTurn()">跳过，看参考答案</button>
+      </div>
+      <div id="conv-input-area"></div>
+    </div>`;
+  renderConvThread();
+}
+
+function renderConvThread() {
+  const thread = document.getElementById('conv-thread');
+  const inputArea = document.getElementById('conv-input-area');
+  const skipRow = document.getElementById('conv-skip-row');
+  if(!thread || !state.dailyConv) return;
+  const turns = state.dailyConv.turns || [];
+  const history = state.convHistory;
+  let html = '';
+  history.forEach(h => {
+    if(h.role==='them') {
+      html += `<div class="bubble-wrap" style="margin-bottom:8px;">
+        <div class="blbl">${BOT_NAME}</div>
+        <div class="bubble l">
+          <div>${h.en}</div>
+          <div style="display:none;margin-top:5px;padding-top:5px;border-top:1px solid var(--border);font-size:12px;color:var(--text2);">${h.cn}</div>
+          <button onclick="toggleCn(this)" style="margin-top:5px;font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;padding:0;font-family:inherit;">显示译文</button>
+        </div>
+      </div>`;
+    } else {
+      html += `<div class="bubble-wrap r" style="margin-bottom:4px;">
+        <div class="blbl">你</div>
+        <div class="bubble r2"><div>${h.userInput}</div></div>
+      </div>`;
+      if(h.feedback) {
+        const fb = h.feedback;
+        if(fb.isCorrect) {
+          html += `<div style="text-align:right;margin-bottom:10px;">
+            <span style="font-size:12px;color:var(--success);background:var(--success-bg);padding:4px 10px;border-radius:20px;">
+              ✓ 正确${fb.nativeExpr?' · 地道说法：'+fb.nativeExpr:''}
+            </span></div>`;
+        } else {
+          html += `<div style="background:var(--warn-bg);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:10px;font-size:13px;">
+            <div style="color:var(--warn);font-weight:600;margin-bottom:3px;">💡 建议</div>
+            <div style="color:var(--text);font-weight:500;">${fb.correction}</div>
+            ${fb.nativeExpr?`<div style="color:var(--text2);margin-top:4px;">更地道：<span style="font-weight:500;">${fb.nativeExpr}</span></div>`:''}
+            ${fb.explain?`<div style="color:var(--text3);margin-top:4px;font-size:12px;">${fb.explain}</div>`:''}
+          </div>`;
+        }
+      }
+    }
+  });
+  thread.innerHTML = html;
+  window.scrollTo(0, document.body.scrollHeight);
+
+  const themCount = turns.length;
+  const themDone = history.filter(h=>h.role==='them').length;
+  const lastEntry = history[history.length-1];
+  const lastIsUser = lastEntry && lastEntry.role==='user';
+  const lastHasFeedback = lastIsUser && lastEntry.feedback !== null;
+  const isDone = themDone >= themCount && lastIsUser && lastHasFeedback;
+
+  if(isDone) {
+    if(inputArea) inputArea.innerHTML='';
+    if(skipRow) skipRow.style.display='none';
+    if(state.convDoneCallback) state.convDoneCallback();
+    else standaloneConvDone();
+    return;
+  }
+  if((lastHasFeedback || history.length===0) && themDone < themCount) {
+    const nextTurn = turns[themDone];
+    if(inputArea) inputArea.innerHTML=`<div style="font-size:13px;color:var(--text3);padding:4px 0;text-align:center;">${BOT_NAME} 正在输入<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div>`;
+    if(skipRow) skipRow.style.display='none';
+    setTimeout(()=>{state.convHistory.push({role:'them',en:nextTurn.en,cn:nextTurn.cn});renderConvThread();if(state.voiceMode)speakText(null,nextTurn.en);},500);
+    return;
+  }
+  if(skipRow) skipRow.style.display='block';
+  if(inputArea) inputArea.innerHTML=`
+    <div style="display:flex;gap:8px;align-items:center;">
+      <textarea id="user-reply" rows="1" placeholder="用${state.lang}回应…"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();submitReply();}"
+        style="flex:1;font-size:15px;resize:none;padding:10px 14px;border-radius:22px;
+        border:1.5px solid var(--border2);background:var(--bg2);color:var(--text);
+        font-family:inherit;line-height:1.4;outline:none;max-height:100px;overflow-y:auto;"></textarea>
+      <button id="mic-btn" onclick="toggleMic()"
+        style="flex-shrink:0;width:40px;height:40px;border-radius:50%;
+        border:1.5px solid var(--border2);background:var(--bg2);cursor:pointer;
+        display:flex;align-items:center;justify-content:center;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>
+        </svg>
+      </button>
+      <button onclick="submitReply()"
+        style="flex-shrink:0;width:40px;height:40px;border-radius:50%;border:none;background:var(--accent);
+        cursor:pointer;display:flex;align-items:center;justify-content:center;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
+        </svg>
+      </button>
+    </div>`;
+  setTimeout(()=>{const ta=document.getElementById('user-reply');if(ta)ta.focus();},100);
+}
+
+function toggleCn(btn) {
+  const hidden=btn.previousElementSibling;
+  if(hidden.style.display==='none'){hidden.style.display='block';btn.textContent='隐藏译文';}
+  else{hidden.style.display='none';btn.textContent='显示译文';}
+}
+
+function toggleVoiceMode(btn) {
+  state.voiceMode=!state.voiceMode;const on=state.voiceMode;
+  btn.style.border=`1.5px solid ${on?'var(--accent)':'var(--border2)'}`;
+  btn.style.background=on?'var(--accent-bg)':'transparent';
+  btn.style.color=on?'var(--accent-text)':'var(--text2)';
+  btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${on?'var(--accent)':'var(--text2)'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>${on?'<path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>':'<line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>'}</svg>${on?'语音朗读 开':'语音朗读 关'}`;
+  if(!on)window.speechSynthesis.cancel();
+}
+
+function toggleMic() {
+  if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){alert('当前浏览器不支持语音识别');return;}
+  if(state.isListening){state.recognition&&state.recognition.stop();state.isListening=false;return;}
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  const r=new SR();
+  const lm={English:'en-US',French:'fr-FR',Spanish:'es-ES',Japanese:'ja-JP',Korean:'ko-KR',German:'de-DE',Italian:'it-IT',Portuguese:'pt-BR',Russian:'ru-RU',Arabic:'ar-SA',Dutch:'nl-NL',Cantonese:'zh-HK'};
+  r.lang=lm[state.lang]||'en-US';r.continuous=false;r.interimResults=true;
+  state.recognition=r;state.isListening=true;
+  const btn=document.getElementById('mic-btn');
+  if(btn){btn.style.border='1.5px solid var(--danger)';btn.style.background='var(--danger-bg)';}
+  r.onresult=e=>{const t=Array.from(e.results).map(x=>x[0].transcript).join('');const ta=document.getElementById('user-reply');if(ta)ta.value=t;};
+  r.onend=()=>{state.isListening=false;const b=document.getElementById('mic-btn');if(b){b.style.border='1.5px solid var(--border2)';b.style.background='var(--bg2)';}};
+  r.onerror=()=>{state.isListening=false;};r.start();
+}
+
+async function submitReply() {
+  const ta=document.getElementById('user-reply');if(!ta)return;
+  const input=ta.value.trim();if(!input)return;
+  const lastThem=[...state.convHistory].reverse().find(h=>h.role==='them');
+  const context=lastThem?`The other person just said: "${lastThem.en}"`:'';
+  state.convHistory.push({role:'user',userInput:input,feedback:null});
+  renderConvThread();
+  apiCall(
+    `You are a ${state.lang} language coach. Evaluate the user's response.
+${context}
+User replied: "${input}"
+Return ONLY JSON: {"isCorrect":true/false,"correction":"corrected version if wrong","nativeExpr":"more natural phrasing (always provide)","explain":"brief explanation in Chinese if wrong, empty if correct","errorType":"grammar|vocabulary|expression|none"}`,
+    'Evaluate now.',500,
+    fb=>{const u=[...state.convHistory].reverse().find(h=>h.role==='user');if(u)u.feedback=fb;if(!fb.isCorrect)saveError(fb.errorType||'expression',input,fb.correction,fb.nativeExpr);renderConvThread();},
+    ()=>{const u=[...state.convHistory].reverse().find(h=>h.role==='user');if(u)u.feedback={isCorrect:true,nativeExpr:'',explain:''};renderConvThread();}
+  );
+}
+
+function skipTurn() {
+  state.convHistory.push({role:'user',userInput:'（跳过）',feedback:{isCorrect:true,nativeExpr:'',explain:''}});
+  renderConvThread();
+}
+
+function standaloneConvDone() {
+  const doneArea=document.getElementById('conv-done-area');if(!doneArea)return;
+  const bar=document.getElementById('conv-input-bar');if(bar)bar.style.display='none';
+  const card=document.getElementById('conv-card');if(card)card.style.paddingBottom='0';
+  let justCheckedIn=false;const day=state.pendingCheckinDay;
+  if(day&&!state.planDone[day]){const today=new Date().toISOString().slice(0,10);state.planDone[day]=today;justCheckedIn=true;if(!state.planStartDate){state.planStartDate=new Date().toISOString();try{localStorage.setItem(lk('startdate'),state.planStartDate);}catch(e){}}try{localStorage.setItem(lk('done'),JSON.stringify(state.planDone));}catch(e){}}
+  state.pendingCheckinDay=null;
+  showXPToast(justCheckedIn?XP_PER_CHECKIN+XP_PER_CONV:XP_PER_CONV,justCheckedIn?`打卡成功 +${XP_PER_CHECKIN+XP_PER_CONV} XP 🎉`:`对话练习 +${XP_PER_CONV} XP`);
+  const userTurns=state.convHistory.filter(h=>h.role==='user');
+  const errors=userTurns.filter(h=>h.feedback&&!h.feedback.isCorrect);
+  const corrects=userTurns.filter(h=>h.feedback&&h.feedback.isCorrect);
+  const accuracy=userTurns.length>0?Math.round(corrects.length/userTurns.length*100):0;
+  const weakPoints=getWeakPoints();
+  doneArea.innerHTML=`<div class="card" style="margin-top:12px;margin-bottom:20px;">
+    ${justCheckedIn?`<div style="background:var(--success-bg);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;"><span style="font-size:22px;">✅</span><div><div style="font-size:13px;font-weight:600;color:var(--success);">打卡成功！</div></div></div>`:''}
+    <div style="text-align:center;margin-bottom:14px;"><div style="font-size:26px;margin-bottom:6px;">${accuracy>=80?'🏆':accuracy>=60?'👍':'💪'}</div>
+    <div style="font-size:15px;font-weight:600;color:var(--text);">对话练习完成！</div></div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;">
+      <div class="stat-card"><div class="stat-val" style="font-size:18px;">${userTurns.length}</div><div class="stat-lbl">回应</div></div>
+      <div class="stat-card"><div class="stat-val" style="font-size:18px;color:var(--success);">${corrects.length}</div><div class="stat-lbl">正确</div></div>
+      <div class="stat-card"><div class="stat-val" style="font-size:18px;color:${errors.length>0?'var(--warn)':'var(--text)'};">${errors.length}</div><div class="stat-lbl">需改进</div></div>
+      <div class="stat-card"><div class="stat-val" style="font-size:18px;">${accuracy}%</div><div class="stat-lbl">正确率</div></div>
+    </div>
+    ${errors.length?`<div style="margin-bottom:12px;">${errors.map(e=>`<div style="background:var(--bg2);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:6px;font-size:13px;"><div style="color:var(--text3);text-decoration:line-through;margin-bottom:2px;">${e.userInput}</div><div style="color:var(--text);font-weight:500;">✓ ${e.feedback?.correction}</div>${e.feedback?.nativeExpr?`<div style="color:var(--accent);font-size:12px;margin-top:2px;">💬 ${e.feedback.nativeExpr}</div>`:''}</div>`).join('')}</div>`:`<div style="background:var(--success-bg);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:12px;text-align:center;font-size:13px;font-weight:600;color:var(--success);">🎉 表达全部正确！</div>`}
+    ${weakPoints?`<div style="background:var(--accent-bg);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--accent-text);">📊 常见错误：${weakPoints}</div>`:''}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <button class="btn btn-ghost" onclick="genDailyTopic('${(state.dailyTopic||'').replace(/'/g,"\\'")}')">再练一次</button>
+      <button class="btn btn-primary" onclick="genRandomDaily()">换个话题</button>
+    </div>
+  </div>`;
+}
+
+
+function renderSpeakingModule(el, data, progress) {
+  state.session.results['speaking'] = { correct:0, total:1, errors:[], submitted:false, data };
+  el.innerHTML = `${progress}
+    <div class="card" style="margin-bottom:12px;">
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px;">🗣️ 口语 & 写作练习</div>
+      <div style="font-size:15px;color:var(--text);line-height:1.7;margin-bottom:10px;">${data.prompt_en}</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:14px;">${data.prompt_cn}</div>
+      <div style="margin-bottom:12px;">
+        <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">提示词</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          ${(data.hints||[]).map(h=>`<span style="background:var(--accent-bg);color:var(--accent-text);font-size:13px;padding:4px 12px;border-radius:20px;">${h}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:12px;">
+      <div style="font-size:13px;color:var(--text2);margin-bottom:8px;">用${state.lang}回答（语音或文字）</div>
+      <div style="display:flex;gap:8px;align-items:flex-end;">
+        <textarea id="speak-reply" rows="3" placeholder="输入你的回答…"
+          style="flex:1;font-size:14px;resize:none;padding:10px 12px;border-radius:var(--radius-sm);
+          border:1px solid var(--border2);background:var(--bg2);color:var(--text);font-family:inherit;"></textarea>
+        <button onclick="toggleSpeakMic(this)" id="speak-mic-btn"
+          style="flex-shrink:0;width:40px;height:40px;border-radius:50%;border:1.5px solid var(--border2);
+          background:var(--bg2);cursor:pointer;display:flex;align-items:center;justify-content:center;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>
+          </svg>
+        </button>
+      </div>
+      <button class="btn btn-primary btn-block" style="margin-top:10px;" onclick="submitSpeaking()">提交答案</button>
+    </div>
+    <button class="btn btn-ghost btn-block" onclick="showSampleAnswer()" style="font-size:13px;">查看参考答案</button>
+    <div id="speak-result" style="display:none;"></div>`;
+}
+
+function toggleSpeakMic(btn) {
+  if(!('webkitSpeechRecognition' in window)&&!('SpeechRecognition' in window)){alert('不支持语音，请文字输入');return;}
+  if(state.isListening){state.recognition&&state.recognition.stop();state.isListening=false;return;}
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  const r=new SR();
+  const lm={English:'en-US',French:'fr-FR',Spanish:'es-ES',Japanese:'ja-JP',Korean:'ko-KR',German:'de-DE',Italian:'it-IT',Portuguese:'pt-BR',Russian:'ru-RU',Arabic:'ar-SA',Dutch:'nl-NL',Cantonese:'zh-HK'};
+  r.lang=lm[state.lang]||'en-US';r.continuous=false;r.interimResults=true;
+  state.recognition=r;state.isListening=true;
+  btn.style.background='var(--danger-bg)';btn.style.border='1.5px solid var(--danger)';
+  r.onresult=e=>{const t=Array.from(e.results).map(x=>x[0].transcript).join('');const ta=document.getElementById('speak-reply');if(ta)ta.value=t;};
+  r.onend=()=>{state.isListening=false;btn.style.background='var(--bg2)';btn.style.border='1.5px solid var(--border2)';};
+  r.start();
+}
+
+async function submitSpeaking() {
+  const ta = document.getElementById('speak-reply');
+  const input = ta ? ta.value.trim() : '';
+  if(!input){if(ta)ta.focus();return;}
+  const data = state.session.results['speaking'].data;
+  showLoadingModal('AI 正在批改…');
+  apiCall(
+    `You are a ${state.lang} language coach. The student was asked: "${data.prompt_en}"
+Student's answer: "${input}"
+Sample answer: "${data.sample_answer}"
+Evaluate the student's response for grammar, vocabulary, and fluency.
+Return ONLY JSON: {"score":0-100,"isGood":true/false,"correction":"improved version of student's answer","nativeExpr":"more natural phrasing","explain":"简短点评（中文，2句话）","errorType":"grammar|vocabulary|expression|none"}`,
+    'Evaluate now.', 500,
+    fb => {
+      hideLoadingModal();
+      const r = state.session.results['speaking'];
+      r.submitted = true;
+      r.correct = fb.score >= 60 ? 1 : 0;
+      if(!fb.isGood) { r.errors.push({userInput:input,correction:fb.correction,nativeExpr:fb.nativeExpr}); saveError(fb.errorType||'expression',input,fb.correction,fb.nativeExpr); }
+      const res = document.getElementById('speak-result');
+      if(res) {
+        res.style.display='block';
+        res.innerHTML=`<div class="card" style="margin-top:12px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <div style="font-size:28px;">${fb.score>=80?'🏆':fb.score>=60?'👍':'💪'}</div>
+            <div><div style="font-size:15px;font-weight:600;color:var(--text);">得分 ${fb.score}/100</div>
+            <div style="font-size:12px;color:var(--text2);">${fb.explain}</div></div>
+          </div>
+          ${!fb.isGood?`<div style="background:var(--warn-bg);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:10px;">
+            <div style="font-size:12px;color:var(--warn);font-weight:600;margin-bottom:4px;">建议改为</div>
+            <div style="font-size:14px;color:var(--text);font-weight:500;">${fb.correction}</div>
+            ${fb.nativeExpr?`<div style="font-size:12px;color:var(--accent);margin-top:4px;">更地道：${fb.nativeExpr}</div>`:''}
+          </div>`:''}
+          <div style="background:var(--bg2);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:12px;">
+            <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">参考答案</div>
+            <div style="font-size:14px;color:var(--text);">${data.sample_answer}</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:4px;">${data.sample_cn}</div>
+          </div>
+          <button class="btn btn-primary btn-block" onclick="completeSpeaking()">完成练习 →</button>
+        </div>`;
+      }
+    },
+    () => { hideLoadingModal(); completeSpeaking(); }
+  );
+}
+
+function showSampleAnswer() {
+  const data = state.session.results['speaking']?.data;
+  if(!data) return;
+  const res = document.getElementById('speak-result');
+  if(res) {
+    res.style.display='block';
+    res.innerHTML=`<div class="card" style="margin-top:12px;">
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px;">参考答案</div>
+      <div style="font-size:14px;color:var(--text);line-height:1.7;">${data.sample_answer}</div>
+      <div style="font-size:13px;color:var(--text3);margin-top:6px;">${data.sample_cn}</div>
+      <button class="btn btn-primary btn-block" style="margin-top:12px;" onclick="completeSpeaking()">完成练习 →</button>
+    </div>`;
+  }
+}
+
+function completeSpeaking() {
+  const r = state.session.results['speaking'];
+  if(!r.submitted) r.correct = 0;
+  state.session.currentModule++;
+  showModuleSummary('speaking', r, () => startNextModule());
+}
+
+// --- MODULE SUMMARY (between modules) ---
+function showModuleSummary(mod, r, next) {
+  const el = document.getElementById('daily-practice-out');
+  if(!el) { next(); return; }
+  const pct = r.total > 0 ? Math.round(r.correct/r.total*100) : 0;
+  const labels = {vocab:'单词',listening:'听力',reading:'阅读',conversation:'对话',speaking:'口语'};
+  const isLast = state.session.currentModule >= state.session.modules.length;
+  el.innerHTML = `
+    <div class="card" style="text-align:center;padding:24px 16px;margin-bottom:12px;">
+      <div style="font-size:28px;margin-bottom:8px;">${pct>=80?'🏆':pct>=60?'👍':'💪'}</div>
+      <div style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:4px;">${labels[mod]||mod}模块完成</div>
+      <div style="font-size:24px;font-weight:700;color:var(--text);margin:10px 0;">${r.correct}<span style="font-size:16px;color:var(--text3);">/${r.total}</span></div>
+      <div style="background:var(--bg3);border-radius:4px;height:6px;margin:0 auto 14px;max-width:200px;">
+        <div style="height:6px;border-radius:4px;background:${pct>=80?'var(--success)':pct>=60?'var(--accent)':'var(--warn)'};width:${pct}%;"></div>
+      </div>
+      ${r.errors&&r.errors.length ? `<div style="background:var(--warn-bg);border-radius:var(--radius-sm);padding:8px 12px;margin-bottom:14px;text-align:left;">
+        <div style="font-size:12px;font-weight:600;color:var(--warn);margin-bottom:4px;">本模块需改进 ${r.errors.length} 处</div>
+        ${r.errors.slice(0,2).map(e=>`<div style="font-size:12px;color:var(--text2);">${e.word||e.userInput||''} ${e.correction?'→ '+e.correction:''}</div>`).join('')}
+      </div>` : `<div style="font-size:13px;color:var(--success);margin-bottom:14px;">全对！出色的表现 ✓</div>`}
+      <button class="btn btn-primary" style="padding:11px 36px;" onclick="this.disabled=true;${isLast?'finishSession()':'('+next.toString()+')()'} ">
+        ${isLast ? '查看总结 🎉' : '下一个模块 →'}
+      </button>
+    </div>`;
+}
+
+function buildProgressHtml() {
+  return `<div style="display:flex;gap:4px;margin-bottom:14px;">
+    ${state.session.modules.map((m,i)=>`
+      <div style="flex:1;height:4px;border-radius:2px;background:${i<state.session.currentModule?'var(--success)':i===state.session.currentModule?'var(--accent)':'var(--bg3)'};"></div>
+    `).join('')}
+  </div>
+  <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">模块 ${state.session.currentModule+1}/${state.session.modules.length} · ${moduleLabel(state.session.modules[state.session.currentModule])}</div>`;
+}
+
+function skipModule(mod) {
+  state.session.results[mod] = { correct:0, total:0, errors:[] };
+  state.session.currentModule++;
+  startNextModule();
+}
+
+function completeModule(mod) {
+  state.session.currentModule++;
+  const r = state.session.results[mod];
+  showModuleSummary(mod, r, () => startNextModule());
+}
+
+// --- SESSION FINAL SUMMARY ---
+function finishSession() {
+  const el = document.getElementById('daily-practice-out');
+  if(!el) return;
+
+  // Checkin
+  let justCheckedIn = false;
+  const day = state.pendingCheckinDay;
+  if(day && !state.planDone[day]) {
+    const today = new Date().toISOString().slice(0,10); // YYYY-MM-DD
+    state.planDone[day] = today; justCheckedIn = true;
+    if(!state.planStartDate) { state.planStartDate=new Date().toISOString(); try{localStorage.setItem(lk('startdate'),state.planStartDate);}catch(e){} }
+    try{localStorage.setItem(lk('done'),JSON.stringify(state.planDone));}catch(e){}
+  }
+  state.pendingCheckinDay = null;
+
+  const totalTime = Math.round((Date.now() - state.session.startTime) / 60000);
+  const results = state.session.results;
+  const modLabels = {vocab:'单词',listening:'听力',reading:'阅读',conversation:'对话',speaking:'口语'};
+  const modIcons  = {vocab:'📝',listening:'🔊',reading:'📖',conversation:'💬',speaking:'🗣️'};
+
+  const totalCorrect = Object.values(results).reduce((a,r)=>a+(r.correct||0),0);
+  const totalQ       = Object.values(results).reduce((a,r)=>a+(r.total||0),0);
+  const overallPct   = totalQ>0 ? Math.round(totalCorrect/totalQ*100) : 0;
+
+  const xpEarned = (justCheckedIn?XP_PER_CHECKIN:0) + XP_PER_CONV;
+  showXPToast(xpEarned, justCheckedIn?`打卡成功 +${xpEarned} XP 🎉`:`练习完成 +${xpEarned} XP`);
+
+  const weakPoints = getWeakPoints();
+
+  el.innerHTML = `
+    <div class="card" style="margin-bottom:12px;">
+      ${justCheckedIn ? `<div style="background:var(--success-bg);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;">
+        <span style="font-size:22px;">✅</span>
+        <div><div style="font-size:13px;font-weight:600;color:var(--success);">打卡成功！</div>
+        <div style="font-size:12px;color:var(--success);opacity:.8;">完成今日练习，+${XP_PER_CHECKIN} XP</div></div>
+      </div>` : ''}
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="font-size:32px;margin-bottom:8px;">${overallPct>=80?'🏆':overallPct>=60?'🎉':'💪'}</div>
+        <div style="font-size:17px;font-weight:600;color:var(--text);margin-bottom:4px;">今日练习完成！</div>
+        <div style="font-size:13px;color:var(--text2);">用时约 ${totalTime} 分钟</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+        <div class="stat-card"><div class="stat-val">${totalCorrect}/${totalQ}</div><div class="stat-lbl">综合正确</div></div>
+        <div class="stat-card"><div class="stat-val">${overallPct}%</div><div class="stat-lbl">正确率</div></div>
+      </div>
+      <div style="background:var(--bg3);border-radius:4px;height:6px;margin-bottom:16px;">
+        <div style="height:6px;border-radius:4px;background:${overallPct>=80?'var(--success)':overallPct>=60?'var(--accent)':'var(--warn)'};width:${overallPct}%;transition:width .5s;"></div>
+      </div>
+      <div style="margin-bottom:14px;">
+        ${state.session.modules.map(mod=>{
+          const r=results[mod]||{correct:0,total:0};
+          const p=r.total>0?Math.round(r.correct/r.total*100):0;
+          return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);">
+            <span style="font-size:16px;">${modIcons[mod]}</span>
+            <span style="flex:1;font-size:14px;color:var(--text);">${modLabels[mod]}</span>
+            <span style="font-size:13px;color:var(--text3);">${r.correct}/${r.total}</span>
+            <div style="width:60px;background:var(--bg3);border-radius:3px;height:5px;">
+              <div style="height:5px;border-radius:3px;background:${p>=80?'var(--success)':p>=60?'var(--accent)':'var(--warn)'};width:${p}%;"></div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+      ${weakPoints?`<div style="background:var(--accent-bg);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:14px;">
+        <div style="font-size:12px;font-weight:600;color:var(--accent-text);margin-bottom:3px;">📊 已记忆薄弱点</div>
+        <div style="font-size:12px;color:var(--accent-text);opacity:.85;">常见错误：${weakPoints}，下次优先复习</div>
+      </div>`:''}
+      <button class="btn btn-primary btn-block" onclick="renderDaily()">返回今日页面</button>
+    </div>`;
+}
+
+async function genDailyTopic(topic) {
+  const el = document.getElementById('daily-practice-out');
+  if(!el) return;
+  showLoadingModal('正在生成练习对话');
+  // For standalone retry: only conv module
+  state.dailyTopic = topic;
+  state.convHistory = [];
+  const weakPoints = getWeakPoints();
+  apiCall(
+    `Create an interactive ${state.lang} conversation practice. Topic: "${topic}".
+${weakPoints}
+Return ONLY JSON:
+{"module":"conversation","topic":"话题（中文）","scenario":"场景（中文，一句）","turns":[{"role":"them","en":"their line","cn":"中文"}]}
+Generate 4-5 them-turns. Keep sentences natural and short.`,
+    `Topic: ${topic}`, 800,
+    data => {
+      hideLoadingModal();
+      state.dailyConv = data;
+      state.convTurnIdx = 0;
+      state.convDoneCallback = null;
+      renderConvPractice();
+    },
+    () => { hideLoadingModal(); if(el) el.innerHTML = errCard(); }
+  );
+}
+
+async function genRandomDaily() {
+  const topics = ['谈论天气','自我介绍','聊周末计划','咖啡店闲聊','讨论电影','邻居闲聊','同事午餐','谈加拿大生活'];
+  const topic = topics[Math.floor(Math.random()*topics.length)];
+  const el = document.getElementById('daily-practice-out');
+  if(el) genDailyTopic(topic);
+}
+
+// SAVED
+function isSaved(en) { return state.saved.some(p=>p.en===en); }
+function toggleSave(en, cn, topic, btn) {
+  const i = state.saved.findIndex(p=>p.en===en);
+  if(i>=0) { state.saved.splice(i,1); btn.textContent='☆'; btn.classList.remove('on'); }
+  else { state.saved.push({en,cn,topic,lang:state.lang}); btn.textContent='★'; btn.classList.add('on'); }
+  try { localStorage.setItem(lk('saved'), JSON.stringify(state.saved)); } catch(e){}
+}
+
+function calcStreak() {
+  // Use real calendar dates stored in planDone values
+  const dates = Object.values(state.planDone)
+    .filter(v => typeof v === 'string' && v.length === 10);
+  const uniqueDates = [...new Set(dates)].sort(); // ascending YYYY-MM-DD
+  if(!uniqueDates.length) return 0;
+
+  const today = new Date().toISOString().slice(0,10);
+  let streak = 0;
+  let cursor = today;
+
+  // Walk backwards day by day from today
+  for(let i = 0; i < 365; i++) {
+    if(uniqueDates.includes(cursor)) {
+      streak++;
+    } else if(i > 0) {
+      break; // gap found, stop
+    }
+    // Move cursor back one day
+    const d = new Date(cursor);
+    d.setDate(d.getDate() - 1);
+    cursor = d.toISOString().slice(0,10);
+  }
+  return streak;
+}
+
+function getAchievements(total, streak, testCount, bestScore) {
+  const badges = [
+    { id:'first_checkin', icon:'🌱', name:'第一步', desc:'完成第一次打卡', unlocked: total >= 1 },
+    { id:'week1', icon:'🔥', name:'坚持一周', desc:'连续打卡7天', unlocked: streak >= 7 },
+    { id:'half', icon:'⚡', name:'过半程', desc:'完成15天计划', unlocked: total >= 15 },
+    { id:'done30', icon:'🏆', name:'30天挑战', desc:'完成完整30天计划', unlocked: total >= 30 },
+    { id:'first_test', icon:'📝', name:'初次测评', desc:'完成第一次语言测试', unlocked: testCount >= 1 },
+    { id:'test3', icon:'📈', name:'持续进步', desc:'完成3次以上测试', unlocked: testCount >= 3 },
+    { id:'score70', icon:'🎯', name:'实力派', desc:'测试正确率达到70%', unlocked: bestScore >= 70 },
+    { id:'score90', icon:'💎', name:'卓越水准', desc:'测试正确率达到90%', unlocked: bestScore >= 90 },
+    { id:'early', icon:'⏰', name:'勤奋学员', desc:'提前完成过任务', unlocked: false }, // set later
+    { id:'streak3', icon:'⚡', name:'连续3天', desc:'连续打卡3天', unlocked: streak >= 3 },
+  ];
+  return badges;
+}
+
+function renderSaved() {
+  const el = document.getElementById('saved-out');
+  if(!el) return;
+
+  const lang = state.lang;
+  const langName = state.langName;
+
+  // === Compute stats ===
+  // Count unique calendar dates (one day = one checkin regardless of how many plan-days done)
+  const checkinDates = Object.values(state.planDone)
+    .map(v => (typeof v === 'string' && v.length === 10) ? v : null)
+    .filter(Boolean);
+  const uniqueDates = [...new Set(checkinDates)];
+  const total = uniqueDates.length; // real calendar days checked in
+
+  // Plan days completed (for the 30-day calendar grid)
+  const planDaysTotal = Object.keys(state.planDone).length;
+  const streak = calcStreak();
+  const testCount = state.testHistory.length;
+  const bestScore = testCount ? Math.max(...state.testHistory.map(h=>h.pct)) : 0;
+  const latestScore = testCount ? state.testHistory[0].pct : null;
+  const latestLevel = latestScore !== null ? getScoreLevel(latestScore) : null;
+
+  // Trend
+  let trend = null;
+  if(testCount >= 2) {
+    trend = state.testHistory[0].pct - state.testHistory[1].pct;
+  }
+
+  // Error analysis
+  const errCounts = {};
+  state.errorMemory.forEach(e => { errCounts[e.type] = (errCounts[e.type]||0)+1; });
+  const errSorted = Object.entries(errCounts).sort((a,b)=>b[1]-a[1]);
+  const weakType = errSorted[0];
+  const totalErrors = state.errorMemory.length;
+  const totalConvReplies = state.errorMemory.length + (state.testHistory.length * 5); // rough estimate
+  const accuracy = totalErrors > 0
+    ? Math.round(100 - (totalErrors / Math.max(totalErrors * 2, 1)) * 100)
+    : null;
+
+  // Plan info
+  const hasGoal = state.planData?.goalBreakdown;
+  const pct = Math.round(planDaysTotal/30*100);
+
+  // Achievements
+  const badges = getAchievements(total, streak, testCount, bestScore);
+
+  // Score chart
+  const chartBars = state.testHistory.slice(0,8).reverse().map((r,i,arr)=>{
+    const isLast = i===arr.length-1;
+    const lv = getScoreLevel(r.pct);
+    return `<div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;min-width:0;">
+      <div style="font-size:9px;color:var(--text3);">${r.pct}%</div>
+      <div style="width:100%;border-radius:3px 3px 0 0;
+        background:${isLast?'var(--accent)':'var(--bg3)'};
+        height:${Math.max(6,Math.round(r.pct*0.9))}px;transition:height .4s;"></div>
+      <div style="font-size:9px;color:var(--text3);text-align:center;">
+        ${new Date(r.date).toLocaleDateString('zh',{month:'numeric',day:'numeric'})}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Streak calendar (last 14 days of plan)
+  let calHtml = '';
+  if(state.planData) {
+    const allDays = state.planData.weeks.flatMap(w=>w.days).slice(0,30);
+    calHtml = `<div style="display:grid;grid-template-columns:repeat(10,1fr);gap:4px;">` +
+      allDays.map(d=>{
+        const done = !!state.planDone[d.day];
+        return `<div title="Day ${d.day}: ${d.topic}"
+          style="aspect-ratio:1;border-radius:4px;
+          background:${done?'var(--success)':'var(--bg3)'};
+          border:1px solid ${done?'var(--success)':'var(--border)'};"></div>`;
+      }).join('') + `</div>`;
+  }
+
+  // Type labels for error breakdown
+  const typeLabels = { grammar:'语法', vocabulary:'词汇', expression:'表达', none:'其他' };
+
+  el.innerHTML = `
+    <!-- Language + level header -->
+    <div class="card" style="margin-bottom:12px;background:var(--accent-bg);border-color:var(--accent);">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="font-size:32px;">${state.langFlag}</div>
+        <div style="flex:1;">
+          <div style="font-size:16px;font-weight:600;color:var(--accent-text);">${langName}学习档案</div>
+          ${latestLevel
+            ? `<div style="font-size:13px;color:var(--accent-text);opacity:.8;margin-top:2px;">
+                当前水平 · 雅思约 ${latestLevel.ielts} · ${latestLevel.label}
+                ${trend!==null ? ` · <span style="color:${trend>=0?'var(--success)':'var(--danger)'};">${trend>=0?'↑':'↓'}${Math.abs(trend)}%</span>` : ''}
+               </div>`
+            : `<div style="font-size:13px;color:var(--accent-text);opacity:.7;margin-top:2px;">完成测试后显示等级</div>`}
+        </div>
+      </div>
+    </div>
+
+    <!-- Key stats -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">
+      <div class="stat-card">
+        <div style="font-size:22px;margin-bottom:2px;">🔥</div>
+        <div class="stat-val">${streak}</div>
+        <div class="stat-lbl">连续打卡</div>
+      </div>
+      <div class="stat-card">
+        <div style="font-size:22px;margin-bottom:2px;">📅</div>
+        <div class="stat-val">${total}</div>
+        <div class="stat-lbl">累计打卡</div>
+      </div>
+      <div class="stat-card">
+        <div style="font-size:22px;margin-bottom:2px;">📝</div>
+        <div class="stat-val">${testCount}</div>
+        <div class="stat-lbl">测试次数</div>
+      </div>
+    </div>
+
+    <!-- Plan progress -->
+    ${state.planData ? `
+    <div class="card" style="margin-bottom:12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div class="card-title" style="margin:0;">30天计划进度</div>
+        <span style="font-size:13px;font-weight:600;color:var(--accent);">${pct}%</span>
+      </div>
+      <div style="background:var(--bg3);border-radius:4px;height:8px;margin-bottom:10px;">
+        <div style="height:8px;border-radius:4px;background:var(--accent);width:${pct}%;transition:width .4s;"></div>
+      </div>
+      ${calHtml}
+      ${hasGoal ? `<div style="margin-top:10px;font-size:12px;color:var(--text2);border-top:1px solid var(--border);padding-top:8px;">
+        🎯 目标：${state.planData.goalBreakdown}
+      </div>` : ''}
+    </div>` : `
+    <div class="card" style="margin-bottom:12px;text-align:center;padding:20px;">
+      <div style="font-size:14px;color:var(--text2);margin-bottom:10px;">还没有学习计划</div>
+      <button class="btn btn-primary btn-sm" onclick="goPage('plan',1)">去制定计划 →</button>
+    </div>`}
+
+    <!-- Test score chart -->
+    ${testCount >= 2 ? `
+    <div class="card" style="margin-bottom:12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div class="card-title" style="margin:0;">测试成绩趋势</div>
+        <span class="badge badge-blue">最高 ${bestScore}%</span>
+      </div>
+      <div style="display:flex;align-items:flex-end;gap:4px;height:90px;">${chartBars}</div>
+    </div>` : testCount === 1 ? `
+    <div class="card" style="margin-bottom:12px;">
+      <div class="card-title">测试成绩</div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="font-size:36px;font-weight:600;color:var(--text);">${latestScore}%</div>
+        <div>
+          <div style="font-size:14px;font-weight:500;color:var(--text);">${latestLevel?.label}</div>
+          <div style="font-size:12px;color:var(--text3);">雅思约 ${latestLevel?.ielts} · 托福约 ${latestLevel?.toefl}</div>
+        </div>
+      </div>
+    </div>` : '' }
+
+    <!-- Strength & Weakness -->
+    ${totalErrors > 0 ? `
+    <div class="card" style="margin-bottom:12px;">
+      <div class="card-title">强项 & 弱点</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+        <div style="background:var(--success-bg);border-radius:var(--radius-sm);padding:10px 12px;">
+          <div style="font-size:11px;font-weight:600;color:var(--success);margin-bottom:4px;">💪 强项</div>
+          <div style="font-size:13px;color:var(--text);">
+            ${errSorted.length < 3 ? '表达流畅' :
+              typeLabels[errSorted[errSorted.length-1]?.[0]] || '综合理解'}
+          </div>
+        </div>
+        <div style="background:var(--warn-bg);border-radius:var(--radius-sm);padding:10px 12px;">
+          <div style="font-size:11px;font-weight:600;color:var(--warn);margin-bottom:4px;">📍 需加强</div>
+          <div style="font-size:13px;color:var(--text);">
+            ${weakType ? (typeLabels[weakType[0]] || weakType[0]) : '暂无数据'}
+          </div>
+        </div>
+      </div>
+      ${errSorted.length > 0 ? `
+      <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">错误类型分布</div>
+      ${errSorted.slice(0,4).map(([type,count])=>{
+        const pct2 = Math.round(count/totalErrors*100);
+        return `<div style="margin-bottom:6px;">
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;">
+            <span style="color:var(--text2);">${typeLabels[type]||type}</span>
+            <span style="color:var(--text3);">${count}次 · ${pct2}%</span>
+          </div>
+          <div style="background:var(--bg3);border-radius:3px;height:5px;">
+            <div style="height:5px;border-radius:3px;background:var(--warn);width:${pct2}%;"></div>
+          </div>
+        </div>`;
+      }).join('')}` : ''}
+    </div>` : `
+    <div class="card" style="margin-bottom:12px;">
+      <div class="card-title">强项 & 弱点</div>
+      <div style="font-size:13px;color:var(--text3);text-align:center;padding:8px 0;">
+        完成几次练习对话后，这里会显示你的强项和弱点
+      </div>
+    </div>`}
+
+    <!-- Achievements -->
+    <div class="card" style="margin-bottom:12px;">
+      <div class="card-title">成就徽章</div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">
+        ${badges.map(b=>`
+          <div title="${b.name}: ${b.desc}"
+            style="display:flex;flex-direction:column;align-items:center;gap:4px;
+            opacity:${b.unlocked?'1':'0.3'};transition:opacity .2s;">
+            <div style="font-size:24px;filter:${b.unlocked?'none':'grayscale(1)'};">${b.icon}</div>
+            <div style="font-size:10px;color:var(--text3);text-align:center;line-height:1.3;">${b.name}</div>
+          </div>`).join('')}
+      </div>
+      <div style="font-size:12px;color:var(--text3);text-align:center;margin-top:10px;">
+        已解锁 ${badges.filter(b=>b.unlocked).length} / ${badges.length} 个成就
+      </div>
+    </div>
+
+    <!-- Motivation hook: next milestone -->
+    ${(() => {
+      const next = badges.find(b=>!b.unlocked);
+      if(!next) return `<div class="card" style="text-align:center;padding:16px;background:var(--success-bg);border-color:var(--success);">
+        <div style="font-size:14px;font-weight:600;color:var(--success);">🎉 所有成就已解锁！继续保持！</div>
+      </div>`;
+      const msgs = {
+        first_checkin: '去每日页面完成今天的打卡',
+        streak3: `再坚持 ${3-streak} 天连续打卡`,
+        week1: `再坚持 ${7-streak} 天连续打卡`,
+        first_test: '去测试页面完成第一次测评',
+        test3: `再完成 ${3-testCount} 次测试`,
+        score70: '继续练习，测试正确率冲70%',
+        half: `再完成 ${15-total} 天打卡`,
+        done30: `再完成 ${30-total} 天打卡`,
+      };
+      return `<div class="card" style="margin-bottom:12px;background:var(--accent-bg);border-color:var(--accent);">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="font-size:28px;filter:grayscale(1);opacity:.5;">${next.icon}</div>
+          <div style="flex:1;">
+            <div style="font-size:12px;color:var(--accent-text);font-weight:600;margin-bottom:2px;">下一个成就：${next.name}</div>
+            <div style="font-size:13px;color:var(--accent-text);">${msgs[next.id]||next.desc}</div>
+          </div>
+        </div>
+      </div>`;
+    })()}
+
+    <!-- Quick actions -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;">
+      <button class="btn btn-ghost" onclick="goPage('plan',1);setTimeout(()=>switchPlanTab('test',document.getElementById('ptab-test')),50)">去测试 →</button>
+      <button class="btn btn-primary" onclick="goPage('daily',2)">今日练习 →</button>
+    </div>`;
+}
+
+// UTILS
+function loading(msg='加载中') {
+  return `<div class="loading">${msg}<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div>`;
+}
+function errCard(msg) {
+  const m = msg || '生成失败，请重试';
+  return `<div class="card" style="color:var(--danger);font-size:14px;text-align:center;padding:20px;">${m}</div>`;
+}
+
+// MODEL / KEY
+function switchModel(m) {
+  state.model = m;
+  try { localStorage.setItem('lb_model', m); } catch(e){}
+  const modelLabels = { claude: 'Claude Sonnet', gpt: 'GPT-4o mini' };
+  const pill = document.getElementById('model-name-pill');
+  if(pill) pill.textContent = modelLabels[m] || m;
+  // sync settings page switcher
+  document.querySelectorAll('#page-settings .model-btn').forEach(b => b.classList.remove('active'));
+  const sb = document.getElementById('sbtn-'+m);
+  if(sb) sb.classList.add('active');
+  updateModelStatus();
+}
+
+function updateModelStatus() {
+  const hasC = !!(state.keys.claude);
+  const hasG = !!(state.keys.gpt);
+  const dc = document.getElementById('dot-claude');
+  const dg = document.getElementById('dot-gpt');
+  if(dc) { dc.classList.toggle('ok', hasC); dc.classList.toggle('no', !hasC); }
+  if(dg) { dg.classList.toggle('ok', hasG); dg.classList.toggle('no', !hasG); }
+  const st = document.getElementById('model-status-text');
+  if(st) {
+    const active = state.model;
+    const hasKey = active==='claude' ? hasC : hasG;
+    st.textContent = hasKey ? `✓ ${active==='claude'?'Claude':'GPT-4o'} Key 已配置，当前使用此模型` : `⚠ 当前模型未填写 Key，请先在上方填入`;
+    st.style.color = hasKey ? 'var(--success)' : 'var(--warn)';
+  }
+}
+
+function saveKey(which) {
+  const val = document.getElementById('key-'+which).value.trim();
+  state.keys[which] = val;
+  try { localStorage.setItem('lb_key_'+which, val); } catch(e){}
+  updateModelStatus();
+}
+
+function loadKeys() {
+  try {
+    state.keys.claude = localStorage.getItem('lb_key_claude') || '';
+    state.keys.gpt = localStorage.getItem('lb_key_gpt') || '';
+    if(state.keys.claude) document.getElementById('key-claude').value = state.keys.claude;
+    if(state.keys.gpt) document.getElementById('key-gpt').value = state.keys.gpt;
+  } catch(e){}
+  const saved = localStorage.getItem('lb_model');
+  if(saved) state.model = saved;
+  switchModel(state.model);
+}
+
+function toggleVis(id, btn) {
+  const el = document.getElementById(id);
+  if(el.type==='password') { el.type='text'; btn.textContent='隐藏'; }
+  else { el.type='password'; btn.textContent='显示'; }
+}
+
+async function testKey(which) {
+  const key = state.keys[which];
+  if(!key) { alert('请先填写 API Key'); return; }
+  const btn = event.target;
+  btn.textContent = '验证中…'; btn.disabled = true;
+  try {
+    let ok = false;
+    if(which==='claude') {
+      const r = await fetch('https://api.anthropic.com/v1/messages', {
+        method:'POST', headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01'},
+        body: JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:10,messages:[{role:'user',content:'hi'}]})
+      });
+      ok = r.ok;
+    } else {
+      const r = await fetch('https://api.openai.com/v1/chat/completions', {
+        method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+        body: JSON.stringify({model:'gpt-4o',max_tokens:10,messages:[{role:'user',content:'hi'}]})
+      });
+      ok = r.ok;
+    }
+    alert(ok ? '✅ Key 有效！' : '❌ Key 无效，请检查');
+  } catch(e) { alert('网络错误，请重试'); }
+  btn.textContent = '验证 Key'; btn.disabled = false;
+}
+
+async function apiCall(system, userMsg, maxTok, onSuccess, onError) {
+  const model = state.model;
+  const key = state.keys[model];
+  if(!key) {
+    if(onError) onError(new Error('no_key'));
+    const pages = ['learn','test','plan','daily'];
+    const activeEl = document.querySelector('.page.active');
+    const hint = `<div class="card" style="text-align:center;padding:20px;">
+      <div style="font-size:14px;color:var(--warn);margin-bottom:12px;">⚠ 请先填写 ${model==='claude'?'Claude':'OpenAI'} API Key</div>
+      <button class="btn btn-primary btn-sm" onclick="goPage('settings',99)">去设置 →</button>
+    </div>`;
+    const targets = ['learn-out','test-q-view','plan-result-view','daily-out'];
+    targets.forEach(id => { const el=document.getElementById(id); if(el && el.parentElement.classList.contains('active') || activeEl) {} });
+    return;
+  }
+
+  try {
+    let parsed;
+    if(model === 'claude') {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
+        body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: maxTok, system, messages: [{ role: 'user', content: userMsg }] })
+      });
+      const data = await res.json();
+      if(data.error) throw new Error(data.error.message);
+      const text = data.content.map(i=>i.text||'').join('');
+      parsed = JSON.parse(text.replace(/```json|```/g,'').trim());
+    } else {
+      const res = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini', max_tokens: maxTok,
+          messages: [{ role: 'system', content: system }, { role: 'user', content: userMsg }],
+          response_format: { type: 'json_object' }
+        })
+      });
+      const data = await res.json();
+      if(data.error) throw new Error(data.error.message);
+      parsed = JSON.parse(data.choices[0].message.content);
+    }
+    onSuccess(parsed);
+  } catch(e) { if(onError) onError(e); }
+}
+
+document.getElementById('learn-input').addEventListener('keydown', e => { if(e.key==='Enter') doLearn(); });
+
+// extend state with session-only fields
+state.model = 'claude';
+state.keys = { claude: '', gpt: '' };
+state.testHistory = [];
+state.dailyDay = null;
+state.viewDay = null;
+state.dailyTopic = '';
+state.planStartDate = null;
+state.convHistory = [];
+state.dailyConv = null;
+state.convTurnIdx = 0;
+state.isListening = false;
+state.recognition = null;
+state.voiceMode = false;
+state.pendingCheckinDay = null;
+state.nickname = '';
+state.avatar = '🙂';
+try { state.nickname = localStorage.getItem('lb_nickname') || ''; } catch(e){}
+try { state.avatar = localStorage.getItem('lb_avatar') || '🙂'; } catch(e){}
+state.errorMemory = [];
+
+// Restore last used language
+try {
+  const saved = JSON.parse(localStorage.getItem('lb_current_lang'));
+  if(saved && LANGS.find(l=>l.val===saved.val)) {
+    state.lang = saved.val; state.langName = saved.name; state.langFlag = saved.flag;
+  }
+} catch(e){}
+
+// Load that language's progress
+loadLangState(state.lang);
+
+init();
+loadKeys();
+</script>
+</body>
+</html>
